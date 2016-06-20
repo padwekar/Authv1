@@ -1,21 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <android.support.v7.widget.CardView
+    android:id="@+id/cardview"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_marginTop="@dimen/activity_horizontal_margin"
-    android:background="@drawable/selector_item"
     android:layout_width="match_parent"
-    android:layout_height="50dp">
-
+    android:layout_height="wrap_content">
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardview2"
+        android:visibility="visible"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_gravity="bottom"
+        android:layout_height="50dp">
+    <LinearLayout
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:id="@+id/linearlayout"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:src="@drawable/ic_plus_black_18dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:src="@drawable/ic_logout_variant_black_18dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:src="@drawable/ic_plus_black_18dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:src="@drawable/ic_logout_variant_black_18dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+        </android.support.v7.widget.CardView>
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardview1"
+        android:visibility="visible"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
     <RelativeLayout
+        android:id="@+id/relativelayout"
         android:layout_margin="@dimen/activity_horizontal_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
             android:id="@+id/textview_task"
             android:textSize="16sp"
+            android:text="GOOGLE"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
-    </RelativeLayout>
 
+    </RelativeLayout>
+        </android.support.v7.widget.CardView>
 </android.support.v7.widget.CardView>
+
+
+<!--
+<com.github.aakira.expandablelayout.ExpandableRelativeLayout
+    xmlns:android2="http://schemas.android.com/apk/res/android"
+    android:id="@+id/expandableLayout"
+    app:ael_expanded="false"
+    app:ael_duration="500"
+    app:ael_interpolator="bounce"
+    app:ael_orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
+    android2:layout_width="match_parent"
+    android2:background="@android:color/holo_blue_light"
+    android2:layout_height="200dp">
+
+    <TextView
+        android:id="@+id/textview_task"
+        android:textSize="16sp"
+        android2:text="ALL IS WELL"
+        android2:layout_width="match_parent"
+        android2:layout_height="wrap_content"/>
+<TextView
+    android2:background="@android:color/holo_green_light"
+    android:layout_below="@id/textview_task"
+    android:text="SAMPPLE..."
+    android2:layout_height="wrap_content"
+    android2:layout_width="wrap_content" />
+</com.github.aakira.expandablelayout.ExpandableRelativeLayout>-->

@@ -46,7 +46,7 @@ public class SignupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(isValid()){
-                    
+                    mProgressBar.setVisibility(View.VISIBLE);
                     String name = mEditTextEmail.getText().toString() ;
                     String password = mEditTextPassword.getText().toString() ;
                     rootRef.createUser(name, password, new Firebase.ResultHandler() {

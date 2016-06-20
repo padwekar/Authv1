@@ -19,7 +19,7 @@
             <EditText
                 android:id="@+id/edittext_add_task"
                 android:hint="Add Task"
-                android:visibility="invisible"
+                android:visibility="gone"
                 android:maxLength="25"
                 android:layout_margin="@dimen/activity_horizontal_margin"
                 android:layout_width="match_parent"
@@ -30,19 +30,29 @@
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:animateLayoutChanges = "true"/>
         </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/floatingbutton_done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="invisible"
+            android:visibility="gone"
             android:src="@drawable/ic_checkbox_marked_circle_outline_white_48dp"
             app:layout_anchor="@id/linearlayout"
             app:layout_anchorGravity="top|right|end"
             android:layout_margin="@dimen/activity_horizontal_margin"/>
 
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floatingbutton_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_logout_variant_white_24dp"
+            app:layout_anchor="@id/linearlayout"
+            app:layout_anchorGravity="bottom|left|end"
+            android:layout_margin="@dimen/activity_horizontal_margin"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/floatingbutton_addtask"
@@ -52,24 +62,45 @@
             app:layout_anchor="@id/linearlayout"
             app:layout_anchorGravity="bottom|right|end"
             android:layout_margin="@dimen/activity_horizontal_margin"/>
+
+
+        <ProgressBar
+            android:id="@+id/progressbar"
+            app:layout_anchor="@id/linearlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_anchorGravity="center"
+            />
     </android.support.design.widget.CoordinatorLayout>
 
 
    <RelativeLayout
-        android:layout_gravity="end"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:background="@drawable/background_drawer"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+       android:layout_gravity="end"
+       >
 
         <TextView
+            android:id="@+id/textview_user_greet"
             android:layout_centerHorizontal="true"
             android:layout_margin="@dimen/activity_horizontal_margin"
-            android:text="Hello , Saurabh"
             android:textSize="24sp"
             android:textColor="@android:color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
+
+       <TextView
+           android:id="@+id/textview_change_password"
+           android:layout_margin="@dimen/activity_horizontal_margin"
+           android:textSize="12sp"
+           android:text="Change Password !"
+            android:layout_centerInParent="true"
+           android:textColor="@android:color/white"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content" />
 
     </RelativeLayout>
 
