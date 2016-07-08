@@ -52,6 +52,7 @@ public class SignupActivity extends AppCompatActivity {
                     rootRef.createUser(name, password, new Firebase.ResultHandler() {
                         @Override
                         public void onSuccess() {
+
                             mProgressBar.setVisibility(View.GONE);
                             Intent intent = new Intent(SignupActivity.this,LoginActivity.class);
                             intent.putExtra("email",mEditTextEmail.getText().toString());

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#509999"
+    android:orientation="vertical">
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+    <RadioGroup
+        android:id="@+id/radiogroup_dashboard"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/radiobutton_alluser"
+            android:gravity="center_horizontal"
+            android:button="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="0.1"
+            android:background="@drawable/background_buttons"
+            android:text="ALL"
+            android:textColor="@drawable/selector_textcolor" />
+
+        <RadioButton
+            android:id="@+id/radiobutton_profile"
+            android:gravity="center_horizontal"
+            android:button="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="0.1"
+            android:background="@drawable/background_buttons"
+            android:text="PRO"
+            android:textColor="@drawable/selector_textcolor" />
+
+        <RadioButton
+            android:id="@+id/radiobutton_friends"
+            android:gravity="center_horizontal"
+            android:button="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="0.1"
+            android:background="@drawable/background_buttons"
+            android:text="FRD"
+            android:textColor="@drawable/selector_textcolor" />
+
+        <RadioButton
+            android:id="@+id/radiobutton_msg"
+            android:gravity="center_horizontal"
+            android:button="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="0.1"
+            android:background="@drawable/background_buttons"
+            android:text="MSG"
+            android:textColor="@drawable/selector_textcolor" />
+
+        <RadioButton
+            android:id="@+id/radiobutton_logout"
+            android:gravity="center_horizontal"
+            android:button="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="0.1"
+            android:background="@drawable/background_buttons"
+            android:text="BYE"
+            android:textColor="@drawable/selector_textcolor" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/textview_user"
+        android:text="Hello"
+        android:textSize="25sp"
+        android:textColor="@android:color/white"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <FrameLayout
+        android:layout_below="@+id/radiogroup_dashboard"
+        android:id="@+id/frame_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+</RelativeLayout>

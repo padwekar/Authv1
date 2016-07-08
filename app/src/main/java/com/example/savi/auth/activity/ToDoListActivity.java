@@ -59,9 +59,7 @@ public class ToDoListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Firebase.setAndroidContext(this);
         setContentView(R.layout.activity_to_do_list);
-
         mTodoList = new ArrayList<>();
-
         mRef= new Firebase("https://todocloudsavi.firebaseio.com/users");
         uid= getIntent().getStringExtra("uid");
         if(uid!=null){
@@ -117,7 +115,7 @@ public class ToDoListActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if(dataSnapshot!=null){
+                            if(dataSnapshot!=null && dataSnapshot.getValue()!=null){
                                 String list  = dataSnapshot.getValue().toString();
                                 mTodoList.clear();
                                 mTodoList = new Gson().fromJson(list,new TypeToken<List<ToDoItem>>(){}.getType());

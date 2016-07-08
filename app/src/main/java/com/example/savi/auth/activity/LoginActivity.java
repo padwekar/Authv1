@@ -115,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void startLoginActivity(String uid) {
-        Intent intent = new Intent(LoginActivity.this,ToDoListActivity.class);
+        Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
         intent.putExtra("uid",uid);
         startActivity(intent);
     }
