@@ -16,7 +16,7 @@
         android:id="@+id/radiogroup_dashboard"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="50dp">
 
         <RadioButton
             android:id="@+id/radiobutton_alluser"
@@ -79,14 +79,6 @@
             android:textColor="@drawable/selector_textcolor" />
     </RadioGroup>
 
-    <TextView
-        android:id="@+id/textview_user"
-        android:text="Hello"
-        android:textSize="25sp"
-        android:textColor="@android:color/white"
-        android:layout_centerInParent="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
     <FrameLayout
         android:layout_below="@+id/radiogroup_dashboard"

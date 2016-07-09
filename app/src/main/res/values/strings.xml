@@ -7,4 +7,18 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_signup">SignupActivity</string>
     <string name="title_activity_to_do_list">ToDoListActivity</string>
+    <integer-array name="avatars">
+        <item>@drawable/avatarm1</item>
+        <item>@drawable/avatarm2</item>
+        <item>@drawable/avatarm3</item>
+        <item>@drawable/avatarm4</item>
+        <item>@drawable/avatarf1</item>
+        <item>@drawable/avatarf2</item>
+        <item>@drawable/avatarf3</item>
+        <item>@drawable/avatarf4</item>
+    </integer-array>
+    <string-array name="user_actions">
+        <item>Send Message</item>
+        <item>Send Friend Request</item>
+    </string-array>
 </resources>

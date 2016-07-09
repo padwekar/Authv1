@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_margin="5dp"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+<ImageView
+        android:id="@+id/imageview_profilepic"
+        android:background="@drawable/avatarf1"
+        android:layout_width="75dp"
+        android:layout_height="75dp" />
+
+<LinearLayout
+
+    android:background="#20757575"
+    android:layout_weight="0.8"
+    android:orientation="vertical"
+    android:layout_width="0dp"
+    android:layout_height="75dp">
+    <TextView
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        android:id="@+id/textview_display"
+        android:text="Savi Healer"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+    <TextView
+        android:layout_weight="1"
+        android:layout_marginLeft="5dp"
+        android:id="@+id/textview_email"
+        android:visibility="gone"
+        android:text="savi@gmail.com"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_weight="1"
+        android:layout_margin="5dp"
+        android:id="@+id/textview_status"
+        android:text="Life is a suffering"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
+</LinearLayout>

@@ -50,7 +50,7 @@
             android:id="@+id/floatingbutton_logout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_logout_variant_white_24dp"
+            android:src="@drawable/ic_plus_grey600_24dp"
             app:layout_anchor="@id/linearlayout"
             app:layout_anchorGravity="bottom|left|end"
             android:layout_margin="@dimen/activity_horizontal_margin"/>

@@ -79,6 +79,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void dologout() {
+        mRef.unauth();
+        finish();
         Toast.makeText(getBaseContext(),"LogOut",Toast.LENGTH_SHORT).show();
     }
 

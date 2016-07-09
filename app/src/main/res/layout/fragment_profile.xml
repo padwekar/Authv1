@@ -1,38 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:layout_margin="@dimen/activity_vertical_margin"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+
+<RelativeLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/edittext_displayname"
-            android:layout_width="match_parent"
-            android:hint="Display Name"
-            android:layout_height="wrap_content" />
-    </android.support.design.widget.TextInputLayout>
-
-
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/edittext_status"
-            android:layout_width="match_parent"
-            android:hint="Status"
-            android:layout_height="wrap_content" />
-    </android.support.design.widget.TextInputLayout>
-
-    <Button
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:id="@+id/button_submit"
-        android:text="Submit"
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_margin="@dimen/activity_vertical_margin"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/imageview_profile"
+            android:background="@drawable/avatarf1"
+            android:layout_gravity="center"
+            android:layout_width="100dp"
+            android:layout_height="100dp" />
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/edittext_displayname"
+                android:layout_width="match_parent"
+                android:hint="Display Name"
+                android:layout_height="wrap_content" />
+
+        </android.support.design.widget.TextInputLayout>
+
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/edittext_status"
+                android:layout_width="match_parent"
+                android:hint="Status"
+                android:layout_height="wrap_content" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <RelativeLayout
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Show Email to Public"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+            <Switch
+                android:id="@+id/switch_email_visibility"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </RelativeLayout>
+          <Button
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:id="@+id/button_submit"
+            android:text="Submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    </RelativeLayout>
+
