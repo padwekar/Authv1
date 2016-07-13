@@ -16,6 +16,7 @@
         <item>@drawable/avatarf2</item>
         <item>@drawable/avatarf3</item>
         <item>@drawable/avatarf4</item>
+        <item>@drawable/add_profile_pic</item>
     </integer-array>
     <string-array name="user_actions">
         <item>Send Message</item>

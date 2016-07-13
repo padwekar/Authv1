@@ -1,10 +1,12 @@
 package com.example.savi.auth.fragment;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -76,9 +78,15 @@ public class ProfileFragment extends Fragment {
                 picSelectAdapter.setOnProfilePicSelectedListener(new ProfilePicSelectAdapter.OnProfilePicSelectedListener() {
                     @Override
                     public void onProfilePicSelected(int position) {
-                        mImgaeView.setImageResource(mTypedArray.getResourceId(position,0));
-                        image_position = position ;
                         dialog.dismiss();
+                        if(position==mTypedArray.length()-1){
+                            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            startActivity(intent);
+                        }else {
+                            mImgaeView.setImageResource(mTypedArray.getResourceId(position,0));
+                            image_position = position ;
+                        }
+
                     }
                 });
                 recyclerView.setLayoutManager(new GridLayoutManager(getContext(),3));
@@ -165,5 +173,13 @@ public class ProfileFragment extends Fragment {
                 });
             }
         }).start();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(data!=null){
+
+        }
     }
 }
