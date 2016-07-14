@@ -6,4 +6,6 @@ package com.example.savi.auth.utils;
 public class Constants {
     public final static int LIST_ITEMS  = 0 ;
     public final static int EDIT_TEXT  = LIST_ITEMS +  1  ;
+    public final static int IMAGE_PICK  = 2 ;
+
 }

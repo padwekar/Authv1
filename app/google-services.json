@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "201303990290",
+    "firebase_url": "https://todocloudsavi.firebaseio.com",
+    "project_id": "todocloudsavi",
+    "storage_bucket": "todocloudsavi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:201303990290:android:c8a6d05c4ffe2671",
+        "android_client_info": {
+          "package_name": "com.example.savi.auth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "201303990290-76i4q1suluem8i0erfvbf2jca0ip344r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQvdiPVBVXsHLuLLTalXPuFRqYEbVFpj0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

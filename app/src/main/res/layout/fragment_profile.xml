@@ -21,7 +21,6 @@
 
         <ImageView
             android:id="@+id/imageview_profile"
-            android:background="@drawable/avatarf1"
             android:layout_gravity="center"
             android:layout_width="100dp"
             android:layout_height="100dp" />
