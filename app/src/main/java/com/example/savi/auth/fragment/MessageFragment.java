@@ -3,6 +3,8 @@ package com.example.savi.auth.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,7 +14,8 @@ import android.widget.Toast;
 
 import com.example.savi.auth.R;
 import com.example.savi.auth.adapter.AllUserAdapter;
-import com.example.savi.auth.model.Message;
+import com.example.savi.auth.adapter.ChatAdapter;
+import com.example.savi.auth.model.MessageItem;
 import com.example.savi.auth.model.User;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -30,22 +33,27 @@ public class MessageFragment extends Fragment {
     List<String> mUIDList ;
     List<User> mUserList ;
     Map<String,User> allUserMap ;
+
     public static MessageFragment newInstance() {
         MessageFragment fragment = new MessageFragment();
         return fragment;
     }
-    AllUserAdapter mAllUserAdapter ;
+    AllUserAdapter mAllUserAdapter  ;
+    ChatAdapter mChatAdapter ;
     Firebase mFireBaseRef ;
     RecyclerView mRecyclerViewMessageList ;
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         View view  = inflater.inflate(R.layout.fragment_messages,container,false);
         Toast.makeText(getContext(),"In MessageFragment",Toast.LENGTH_SHORT).show();
+        Firebase.setAndroidContext(getContext());
+
+        mChatAdapter = new ChatAdapter(getContext());
         mAllUserAdapter = new AllUserAdapter(getContext(),true);
         mFireBaseRef = new Firebase("https://todocloudsavi.firebaseio.com/");
         allUserMap = new HashMap<>();
-        String uid = getActivity().getIntent().getStringExtra("uid");
+        final String uid = getActivity().getIntent().getStringExtra("uid");
         mRecyclerViewMessageList = (RecyclerView)view.findViewById(R.id.recycler_view_messages);
         mRecyclerViewMessageList.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerViewMessageList.setAdapter(mAllUserAdapter);
@@ -55,8 +63,15 @@ public class MessageFragment extends Fragment {
                 if (dataSnapshot != null && dataSnapshot.getValue() != null) {
                     String data = dataSnapshot.getValue().toString();
                     User user = new Gson().fromJson(data, User.class);
-                    if(user!=null && user.getMessageMap() != null)
-                    mAllUserAdapter.addMessageMap(user.getMessageMap() );
+                    if (user != null && user.getMessageMap() != null) {
+                        Map<String, List<MessageItem>> messageMap = user.getMessageMap();
+
+                        if(messageMap.containsKey(uid))
+                            messageMap.remove(uid);
+
+                        mAllUserAdapter.addMessageMap(user.getMessageMap());
+                    }
+
                 }
             }
 
@@ -88,7 +103,7 @@ public class MessageFragment extends Fragment {
                                     else
                                         mUserList.set(keyIndex, user);
 
-                                    allUserMap.put(dataSnapshot.getKey(),user);
+                                    allUserMap.put(dataSnapshot.getKey(), user);
                                     mAllUserAdapter.addUserList(mUserList);
                                     mAllUserAdapter.addKeyUserMapp(allUserMap);
                                 }
@@ -108,6 +123,22 @@ public class MessageFragment extends Fragment {
 
             }
         });
+
+        mAllUserAdapter.setUserItemClickListener(new AllUserAdapter.OnUserItemClickListener() {
+            @Override
+            public void onItemClick(String receiverUID) {
+                setFragment(ChatFragment.newInstance(receiverUID,allUserMap));
+            }
+        });
+
         return view ;
+    }
+
+
+    private void setFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager() ;
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.frame_layout,fragment);
+        fragmentTransaction.commit();
     }
 }

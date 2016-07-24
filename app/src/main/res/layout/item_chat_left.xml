@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parent_linearlayout_chat"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:gravity="start">
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/linearlayout_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_chat_others"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textview_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="hi bechod"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textview_msg_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="5dp"
+            android:textColor="@android:color/holo_blue_light"
+            android:textSize="10sp" />
+    </LinearLayout>
+</LinearLayout>

@@ -35,6 +35,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Firebase.setAndroidContext(getBaseContext());
         setContentView(R.layout.activity_dashboard);
         uid = getIntent().getStringExtra("uid");
         RadioGroup radioGroupProfileOptions = (RadioGroup)findViewById(R.id.radiogroup_dashboard);
@@ -53,7 +54,10 @@ public class HomeActivity extends AppCompatActivity {
 
 
         allUserList = new ArrayList<>();
+
         mRef = new Firebase("https://todocloudsavi.firebaseio.com/user");
+        String email = mRef.getAuth().getProviderData().get("email").toString() ;
+        setTitle(email.substring(0,email.indexOf('@')));
         mFirebaseRefAllUser = new Firebase("https://todocloudsavi.firebaseio.com/alluser");
         mFirebaseRefAllUser.addValueEventListener(new ValueEventListener() {
             @Override
@@ -89,5 +93,10 @@ public class HomeActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout,fragment);
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 }

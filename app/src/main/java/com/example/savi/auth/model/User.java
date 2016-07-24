@@ -1,10 +1,11 @@
 package com.example.savi.auth.model;
 
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class User  {
+
     final static int MSG_USER_DATA_SUCCESS_IN = 0 ;
     final static int MSG_USER_DATA_SUCCESS_OUT = MSG_USER_DATA_SUCCESS_IN+1 ;
 
@@ -14,15 +15,31 @@ public class User  {
     private boolean isVisible ;
     private String email ;
     private int picPosition ;
-    private Map<String,List<Message>> messageMap ;
+    private LinkedHashMap<String,List<MessageItem>> messageMap ;
+    private String profileDownloadUri ;
 
-    public Map<String, List<Message>> getMessageMap() {
+    public String getProfileDownloadUri() {
+        return profileDownloadUri;
+    }
+
+    public void setProfileDownloadUri(String profileDownloadUri) {
+        this.profileDownloadUri = profileDownloadUri;
+    }
+
+    public LinkedHashMap<String, List<MessageItem>> getMessageMap() {
         return messageMap;
     }
 
-    public void setMessageMap(Map<String, List<Message>> messageMap) {
+
+    public User() {
+        super();
+    }
+
+    public void setMessageMap(LinkedHashMap<String, List<MessageItem>> messageMap) {
         this.messageMap = messageMap;
     }
+
+
 
     public String getUid() {
         return uid;

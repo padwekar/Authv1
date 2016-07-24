@@ -7,7 +7,6 @@
 
 <ImageView
         android:id="@+id/imageview_profilepic"
-        android:background="@drawable/avatarf1"
         android:layout_width="75dp"
         android:layout_height="75dp" />
 
@@ -18,16 +17,30 @@
     android:orientation="vertical"
     android:layout_width="0dp"
     android:layout_height="75dp">
-    <TextView
+
+    <RelativeLayout
+        android:layout_weight="1"
         android:layout_marginTop="5dp"
+        android:gravity="center_vertical"
         android:layout_marginLeft="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+    <TextView
         android:id="@+id/textview_display"
         android:text="Savi Healer"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:layout_width="match_parent"
+        android:textStyle="bold"
+        android:textSize="18dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <TextView
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+            android:id="@+id/textview_timestamp"
+            android:text="Savi Healer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
 
     <TextView
         android:layout_weight="1"
@@ -43,6 +56,7 @@
         android:layout_margin="5dp"
         android:id="@+id/textview_status"
         android:text="Life is a suffering"
+        android:textColor="@android:color/darker_gray"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

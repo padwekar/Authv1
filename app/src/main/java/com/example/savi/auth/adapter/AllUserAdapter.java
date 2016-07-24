@@ -2,7 +2,8 @@ package com.example.savi.auth.adapter;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v4.content.ContextCompat;
+import android.graphics.Color;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,17 +12,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.savi.auth.R;
-import com.example.savi.auth.model.Message;
+import com.example.savi.auth.model.MessageItem;
 import com.example.savi.auth.model.User;
-import com.firebase.client.DataSnapshot;
+import com.example.savi.auth.utils.CircleTransform;
 import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,10 +35,10 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
     Context mContext ;
     TypedArray mTypedArray ;
     OnUserItemClickListener IOnItemClickListener ;
-    Map<String,List<Message>> messageMap ;
+    LinkedHashMap<String,List<MessageItem>> messageMap ;
     Firebase mFireBaseRef ;
     public interface OnUserItemClickListener{
-        void onItemClick(int position);
+        void onItemClick(String receiverUID);
     }
 
     public void setUserItemClickListener(OnUserItemClickListener IOnItemClickListener){
@@ -50,7 +49,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
         mUIDKeyList = new ArrayList<>();
         mUserList = new ArrayList<>();
         mKeyUserMap = new HashMap<>();
-        messageMap = new HashMap<>();
+        messageMap = new LinkedHashMap<>();
         this.mContext = mContext ;
         mTypedArray = mContext.getResources().obtainTypedArray(R.array.avatars);
         this.isInboxList = isInboxList ;
@@ -70,15 +69,19 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
         this.mKeyUserMap.putAll(mKeyUserMap);
         notifyDataSetChanged();
     }
-    public void addMessageMap( Map<String,List<Message>> messageMap){
+    public void addMessageMap( Map<String,List<MessageItem>> messageMap){
         this.messageMap.clear();
-        this.messageMap.putAll(messageMap);
-        setKeySet(messageMap);
+     //   this.messageMap.putAll(messageMap);
+        ArrayList<String> arrayList =  new ArrayList<>(messageMap.keySet());
+        for(int i = arrayList.size()-1 ; i >= 0 ; i -- ){
+            this.messageMap.put(arrayList.get(i),messageMap.get(arrayList.get(i)));
+        }
+        setKeySet(this.messageMap);
         notifyDataSetChanged();
     }
 
 
-    private void setKeySet(Map<String,List<Message>> messageMap) {
+    private void setKeySet(Map<String,List<MessageItem>> messageMap) {
         mUIDKeyList.clear();
         for ( String key : messageMap.keySet() ) {
             mUIDKeyList.add(key);
@@ -101,16 +104,28 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
     @Override
     public void onBindViewHolder(AllUserAdapter.AllUserViewHolder holder, int position) {
         if(!isInboxList){
-            holder.mImageView.setImageResource(mTypedArray.getResourceId(mUserList.get(position).getPicPosition(),0));
+            if(mUserList.get(position).getPicPosition()>=0)
+                Picasso.with(mContext).load(mTypedArray.getResourceId(mUserList.get(position).getPicPosition(),0)).transform(new CircleTransform(Color.WHITE,5)).fit().into(holder.mImageView);
+            else
+                Picasso.with(mContext).load(Uri.parse(mUserList.get(position).getProfileDownloadUri())).transform(new CircleTransform(Color.WHITE,5)).fit().into(holder.mImageView);
             holder.mTextviewName.setText(mUserList.get(position).getDisplayName());
             holder.mTextviewStatus.setText(mUserList.get(position).getStatus());
         }else if(messageMap.size()>0 && mKeyUserMap.size()>0) {
            //
             User  sender =  mKeyUserMap.get(mUIDKeyList.get(position));
             if(sender!=null){
-                holder.mImageView.setImageResource(mTypedArray.getResourceId(sender.getPicPosition(),0));
+                if(sender.getPicPosition()>=-0)
+                    Picasso.with(mContext).load(mTypedArray.getResourceId(sender.getPicPosition(),0)).transform(new CircleTransform(Color.WHITE,5)).fit().into(holder.mImageView);
+                else
+                    Picasso.with(mContext).load(Uri.parse(sender.getProfileDownloadUri())).transform(new CircleTransform(Color.WHITE,5)).fit().into(holder.mImageView);
+
                 holder.mTextviewName.setText(sender.getDisplayName());
-                holder.mTextviewStatus.setText(messageMap.get(sender.getUid()).get(0).getMessage());
+                List<MessageItem> msgList = messageMap.get(sender.getUid()) ;
+                if(msgList.get(msgList.size() - 1).getSelf())
+                holder.mTextviewStatus.setText("You : " + msgList.get(msgList.size() - 1).getMessage());
+                else
+                holder.mTextviewStatus.setText( sender.getEmail().substring(0,sender.getEmail().indexOf('@')) +" : " + msgList.get(msgList.size() - 1).getMessage());
+
             }
 
         }
@@ -138,7 +153,9 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
                 @Override
                 public void onClick(View v) {
                     if(!isInboxList)
-                    IOnItemClickListener.onItemClick(getAdapterPosition());
+                        IOnItemClickListener.onItemClick(mUserList.get(getAdapterPosition()).getUid());
+                    else
+                        IOnItemClickListener.onItemClick(mKeyUserMap.get(mUIDKeyList.get(getAdapterPosition())).getUid());
                 }
             });
         }
