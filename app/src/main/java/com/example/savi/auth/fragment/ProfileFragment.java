@@ -94,7 +94,7 @@ public class ProfileFragment extends Fragment {
         mFireBaseUserRef = new Firebase("https://todocloudsavi.firebaseio.com/user");
 
         mRef = new Firebase("https://todocloudsavi.firebaseio.com/");
-        mRef.child("detaileduser");
+        mRef.child("detaileduser_v1");
 
         mFirebaseStorage = FirebaseStorage.getInstance();
         mStorageReference = mFirebaseStorage.getReferenceFromUrl("gs://todocloudsavi.appspot.com/");
@@ -186,7 +186,7 @@ public class ProfileFragment extends Fragment {
         });
 
 
-        mRef.child("detaileduser").addValueEventListener(new ValueEventListener() {
+       /* mRef.child("detaileduser").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot postSnapShot : dataSnapshot.getChildren()) {
@@ -199,7 +199,7 @@ public class ProfileFragment extends Fragment {
             public void onCancelled(FirebaseError firebaseError) {
 
             }
-        });
+        });*/
         return view;
     }
 
@@ -218,14 +218,7 @@ public class ProfileFragment extends Fragment {
         user.setUid(uid);
         user.setProfileDownloadUri(imageUri);
 
-
-        UserTest test = new UserTest();
-        test.setDisplayName(displayName);
-        test.setStatus(status);
-        test.setUid(uid);
-
-        String data = new Gson().toJson(user);
-        mFireBaseUserRef.child(uid).setValue(data);
+        mRef.child("detaileduser_v1").child(uid).setValue(user);
         mProgressbar.setVisibility(View.GONE);
 
 /*
@@ -295,13 +288,14 @@ public class ProfileFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                mFireBaseUserRef.child(uid).addValueEventListener(new ValueEventListener() {
+
+                mRef.child("detaileduser_v1").child(uid).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                            if(dataSnapshot!=null && dataSnapshot.getValue()!=null){
-                                String data = dataSnapshot.getValue().toString() ;
-                                user = new User();
-                                user = new Gson().fromJson(data,User.class);
+                        if (dataSnapshot != null && dataSnapshot.getValue() != null) {
+
+                            User user = dataSnapshot.getValue(User.class);
+
                                 String displayName = user.getDisplayName() ;
                                 String status = user.getStatus() ;
                                 image_position = user.getPicPosition() ;
@@ -314,7 +308,7 @@ public class ProfileFragment extends Fragment {
                                     Picasso.with(getContext()).load(Uri.parse(user.getProfileDownloadUri())).transform(new CircleTransform(Color.WHITE, 5)).into(mImgaeViewProfile);
 
                                 notifyHandler(handler, Constants.SUCCESS_USER_VALUE_SET, user.getPicPosition());
-                            }
+                        }
                     }
 
                     @Override

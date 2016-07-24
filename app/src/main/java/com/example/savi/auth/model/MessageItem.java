@@ -1,10 +1,15 @@
 package com.example.savi.auth.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * Created by Savi on 09-07-2016.
  */
+
+
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageItem {
 
 

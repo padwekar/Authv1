@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +21,15 @@ import com.example.savi.auth.model.User;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.GenericTypeIndicator;
+import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +42,7 @@ public class MessageFragment extends Fragment {
         MessageFragment fragment = new MessageFragment();
         return fragment;
     }
+    User sender ;
     AllUserAdapter mAllUserAdapter  ;
     ChatAdapter mChatAdapter ;
     Firebase mFireBaseRef ;
@@ -57,56 +62,27 @@ public class MessageFragment extends Fragment {
         mRecyclerViewMessageList = (RecyclerView)view.findViewById(R.id.recycler_view_messages);
         mRecyclerViewMessageList.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerViewMessageList.setAdapter(mAllUserAdapter);
-        mFireBaseRef.child("user").child(uid).addValueEventListener(new ValueEventListener() {
+
+        final Firebase mFireBaseRefnew = mFireBaseRef.child("message_center").child(uid) ;
+        mFireBaseRefnew.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                final Map<String, MessageItem> messageMap = new LinkedHashMap<String, MessageItem>();
                 if (dataSnapshot != null && dataSnapshot.getValue() != null) {
-                    String data = dataSnapshot.getValue().toString();
-                    User user = new Gson().fromJson(data, User.class);
-                    if (user != null && user.getMessageMap() != null) {
-                        Map<String, List<MessageItem>> messageMap = user.getMessageMap();
 
-                        if(messageMap.containsKey(uid))
-                            messageMap.remove(uid);
-
-                        mAllUserAdapter.addMessageMap(user.getMessageMap());
-                    }
-
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
-
-        mFireBaseRef.child("alluser").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot != null && dataSnapshot.getValue() != null) {
-                    String data = dataSnapshot.getValue().toString();
-                    mUIDList = new Gson().fromJson(data, new TypeToken<List<String>>() {
-                    }.getType());
-                    mUserList = new ArrayList<User>();
-                    for (int i = 0; i < mUIDList.size(); i++) {
-
-                        mFireBaseRef.child("user").child(mUIDList.get(i)).addValueEventListener(new ValueEventListener() {
+                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                        HashMap<String,MessageItem> dataSnapshotValue = (HashMap<String, MessageItem>) postSnapshot.getValue();
+                        String k = postSnapshot.getKey() ;
+                        MessageItem  item = dataSnapshotValue.get("KNRZnY1sbpwiH6wNp5e");
+                        Log.i("message","");
+                        String key = postSnapshot.getKey() ;
+                        long count =  postSnapshot.getChildrenCount();
+                        Log.i("Count ",count+" , "+key);
+                        mFireBaseRefnew.child(key).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (dataSnapshot != null && dataSnapshot.getValue() != null) {
-                                    String userData = dataSnapshot.getValue().toString();
-                                    User user = new Gson().fromJson(userData, User.class);
-                                    int keyIndex = mUIDList.indexOf(dataSnapshot.getKey());
-                                    if (mUIDList.size() != mUserList.size())
-                                        mUserList.add(user);
-                                    else
-                                        mUserList.set(keyIndex, user);
-
-                                    allUserMap.put(dataSnapshot.getKey(), user);
-                                    mAllUserAdapter.addUserList(mUserList);
-                                    mAllUserAdapter.addKeyUserMapp(allUserMap);
-                                }
+                            MessageItem messageItem = dataSnapshot.getValue(MessageItem.class);
+                                Log.i("message",messageItem.getMessage());
                             }
 
                             @Override
@@ -114,7 +90,19 @@ public class MessageFragment extends Fragment {
 
                             }
                         });
+
                     }
+
+                 /*   User user = dataSnapshot.getValue(User.class);
+                    if (user != null && user.getMessageMap() != null) {
+                        Map<String, List<MessageItem>> messageMap = user.getMessageMap();
+
+                        if (messageMap.containsKey(uid))
+                            messageMap.remove(uid);
+
+                        mAllUserAdapter.addMessageMap(user.getMessageMap());
+                    }*/
+
                 }
             }
 
@@ -124,6 +112,35 @@ public class MessageFragment extends Fragment {
             }
         });
 
+
+        mFireBaseRef.child("detaileduser_v1").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot != null && dataSnapshot.getValue() != null) {
+                    mUserList = new ArrayList<User>();
+                    mUIDList = new ArrayList<String>();
+                    for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+                        User user =  postSnapshot.getValue(User.class) ;
+                        if(!user.getUid().equals(uid)){
+                            mUserList.add(user);
+                            mUIDList.add(user.getUid());
+                        }else  if(user.getUid().equals(uid)){
+                            sender = user ;
+                        }
+                        allUserMap.put(user.getUid(),user);
+
+                    }
+                    mAllUserAdapter.addUserList(mUserList);
+                    mAllUserAdapter.addKeyUserMapp(allUserMap);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
         mAllUserAdapter.setUserItemClickListener(new AllUserAdapter.OnUserItemClickListener() {
             @Override
             public void onItemClick(String receiverUID) {

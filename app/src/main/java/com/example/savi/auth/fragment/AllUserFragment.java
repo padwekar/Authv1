@@ -42,6 +42,7 @@ public class AllUserFragment extends Fragment {
     Firebase mFireBaseRef ;
     ProgressBar mProgressBar ;
     AllUserAdapter.OnUserItemClickListener IOnItemClickListener ;
+    User sender ;
 
     String uid ;
     @Nullable
@@ -50,46 +51,29 @@ public class AllUserFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_alluser,container,false);
         mProgressBar = (ProgressBar)view.findViewById(R.id.progressbar);
         mFireBaseRef = new Firebase("https://todocloudsavi.firebaseio.com/");
+        mFireBaseRef.child("message_center");
         mAllUserAdapter = new AllUserAdapter(getContext(),false);
         uid = getActivity().getIntent().getStringExtra("uid");
         RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.recycler_view_alluser);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(mAllUserAdapter);
-        mFireBaseRef.child("alluser").addValueEventListener(new ValueEventListener() {
+
+        mFireBaseRef.child("detaileduser_v1").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot != null && dataSnapshot.getValue() != null) {
-                    String data = dataSnapshot.getValue().toString();
-                    mUIDList = new Gson().fromJson(data, new TypeToken<List<String>>() {
-                    }.getType());
-                    mUIDList.remove(uid);
-                        mUserList = new ArrayList<User>();
-                        for (int i = 0; i < mUIDList.size(); i++) {
-
-                            mFireBaseRef.child("user").child(mUIDList.get(i)).addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot != null && dataSnapshot.getValue() != null) {
-                                        String userData = dataSnapshot.getValue().toString();
-                                        User user = new Gson().fromJson(userData, User.class);
-                                        int keyIndex = mUIDList.indexOf(dataSnapshot.getKey());
-                                        if (mUIDList.size() != mUserList.size())
-                                            mUserList.add(user);
-                                        else{
-                                            mUserList.set(keyIndex, user);
-                                        }
-                                        mProgressBar.setVisibility(View.GONE);
-                                        mAllUserAdapter.addUserList(mUserList);
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(FirebaseError firebaseError) {
-
-                                }
-                            });
+                    mUserList = new ArrayList<User>();
+                    mUIDList = new ArrayList<String>();
+                    for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+                        User user =  postSnapshot.getValue(User.class) ;
+                        if(!user.getUid().equals(uid)){
+                            mUserList.add(user);
+                            mUIDList.add(user.getUid());
+                        }else  if(user.getUid().equals(uid)){
+                            sender = user ;
                         }
-
+                    }
+                    mAllUserAdapter.addUserList(mUserList);
                 }
 
             }
@@ -100,11 +84,20 @@ public class AllUserFragment extends Fragment {
             }
         });
         Toast.makeText(getContext(), "In AllUserFragment", Toast.LENGTH_SHORT).show();
+
         mAllUserAdapter.setUserItemClickListener(new AllUserAdapter.OnUserItemClickListener() {
             @Override
             public void onItemClick(final String receiverUID) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                final String people = mUserList.get(mUIDList.indexOf(receiverUID)).getDisplayName();
+                User receiver = new User(); ;
+                for(User user : mUserList){
+                    if(user.getUid().equals(receiverUID)){
+                        receiver = user ;
+                        break;
+                    }
+                }
+                final String people = receiver.getDisplayName();
+                final User receiverInfo = receiver ;
                 builder.setTitle(people + " ")
                         .setItems(R.array.user_actions, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
@@ -119,7 +112,8 @@ public class AllUserFragment extends Fragment {
                                         public void onClick(DialogInterface dialog, int which) {
                                             if (!mEditText.getText().toString().equals("")) {
                                                 Toast.makeText(getContext(), "Sending", Toast.LENGTH_SHORT).show();
-                                                sendMessageto(receiverUID,mEditText.getText().toString());
+                                             //   sendMessageto(receiverUID, mEditText.getText().toString());
+                                                sendMessageto(receiverInfo,mEditText.getText().toString(),true);
                                                 dialog.dismiss();
                                             }
                                         }
@@ -146,18 +140,17 @@ public class AllUserFragment extends Fragment {
       //  final String receiverUid = mUIDList.get(position);
 
         //receiver change listener
-        mFireBaseRef.child("user").child(receiverUid).addValueEventListener(new ValueEventListener() {
+        mFireBaseRef.child("detaileduser_v1").child(receiverUid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 try {
                     if(dataSnapshot!=null && dataSnapshot.getValue()!=null){
 
+                        User receiverInfo = dataSnapshot.getValue(User.class);
+
                         //Get the receiver object as a String
-                        String data = dataSnapshot.getValue().toString();
                         String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "";
 
-                        //Convert it to receiver object
-                        User receiverInfo = new Gson().fromJson(data, User.class);
 
                         //Get the MessageItem Map of Receiver
                         LinkedHashMap<String,List<MessageItem>> messageMap = receiverInfo.getMessageMap() ;
@@ -241,4 +234,30 @@ public class AllUserFragment extends Fragment {
     }
 
 
+    private void sendMessageto(final User receiver, final String message , boolean isNew) {
+        String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "";
+        mFireBaseRef.child("message_center").child(receiver.getUid()).child(sender.getUid()).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW));
+        mFireBaseRef.child("message_center").child(sender.getUid()).child(receiver.getUid()).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW,true));
+        /*//Get the MessageItem Map of Receiver
+        LinkedHashMap<String,List<MessageItem>> messageMap = receiver.getMessageMap() ;
+        LinkedHashMap<String,List<MessageItem>> senderMessageMap =sender.getMessageMap() ;
+
+        messageMap = messageMap==null? new LinkedHashMap<String, List<MessageItem>>() : messageMap ;
+        senderMessageMap = senderMessageMap==null? new LinkedHashMap<String, List<MessageItem>>() : senderMessageMap ;
+
+        //Get the Sender Uid block
+        List<MessageItem> messageItemList = messageMap.get(uid);
+        List<MessageItem> senderMessageItemList = senderMessageMap.get(receiver.getUid());
+
+        messageItemList = messageItemList==null ? new ArrayList<MessageItem>() : messageItemList ;
+        senderMessageItemList = senderMessageItemList==null ? new ArrayList<MessageItem>() : senderMessageItemList ;
+
+        messageItemList.add(new MessageItem(uid, message, timeStamp, MessageItem.NEW));
+        senderMessageItemList.add(new MessageItem(uid, message, timeStamp, MessageItem.NEW,true));
+*/
+
+    //    mFireBaseRef.child("detaileduser_v1").child(receiver.getUid()).child("messageMap").child(uid).setValue(messageItemList);
+    //    mFireBaseRef.child("detaileduser_v1").child(uid).child("messageMap").child(receiver.getUid()).setValue(senderMessageItemList);
+
+    }
 }

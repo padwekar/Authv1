@@ -44,6 +44,8 @@ public class ChatFragment extends Fragment {
     private EditText mEditTextMessageInput ;
     private RelativeLayout mRelativeLayoutButtonSend ;
     private TextView mTextviewReceiver ;
+    private  User sender ;
+    List<MessageItem> messageItemList ;
 
     public static ChatFragment newInstance(String receiverId , Map<String ,User> allUserMap ) {
         ChatFragment fragment = new ChatFragment();
@@ -57,10 +59,10 @@ public class ChatFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detailed_chat, container, false);
 
-
         mTextviewReceiver = (TextView)view.findViewById(R.id.textview_receiver);
+        messageItemList = new ArrayList<>();
 
-        mRefUser = new Firebase("https://todocloudsavi.firebaseio.com/user");
+        mRefUser = new Firebase("https://todocloudsavi.firebaseio.com/");
         mFirebaseStorage = FirebaseStorage.getInstance();
         mStorageReference = mFirebaseStorage.getReferenceFromUrl("gs://todocloudsavi.appspot.com/");
 
@@ -70,7 +72,7 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 String message = mEditTextMessageInput.getText().toString() ;
                 if(!message.equals("")){
-                    sendMessageto(receiverId,message);
+                    sendMessageto(allUserMap.get(receiverId),message,true);
                     mEditTextMessageInput.setText("");
                 }
             }
@@ -78,6 +80,7 @@ public class ChatFragment extends Fragment {
         mEditTextMessageInput = (EditText)view.findViewById(R.id.edittext_inputmsg);
         
         uid = getActivity().getIntent().getStringExtra("uid"); ;
+        sender = allUserMap.get(uid);
 
         mTextviewReceiver.setText(allUserMap.get(receiverId).getDisplayName());
 
@@ -86,18 +89,23 @@ public class ChatFragment extends Fragment {
         recyclerViewMessages.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewMessages.setAdapter(chatAdapter);
 
-        mRefUser.child(uid).addValueEventListener(new ValueEventListener() {
+        mRefUser.child("message_center").child(uid).child(receiverId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot != null && dataSnapshot.getValue().toString() != null) {
-                    String data = dataSnapshot.getValue().toString();
-                    User sender = new Gson().fromJson(data, User.class);
+                if (dataSnapshot.getValue() != null && dataSnapshot.getValue().toString() != null) {
+                    for (DataSnapshot postSnapShot : dataSnapshot.getChildren()) {
+                        MessageItem item = postSnapShot.getValue(MessageItem.class);
+                        messageItemList.add(item);
+                    }
+                    chatAdapter.addMessageList(messageItemList);
+                    recyclerViewMessages.scrollToPosition(messageItemList.size()-1);
+                   /* User sender = dataSnapshot.getValue(User.class);
                     LinkedHashMap<String, List<MessageItem>> messageMap = sender.getMessageMap();
                     messageMap = messageMap == null ? new LinkedHashMap<String, List<MessageItem>>() : sender.getMessageMap();
                     List<MessageItem> messageItemList = messageMap.get(receiverId);
                     messageItemList = messageItemList == null ? new ArrayList<MessageItem>() : messageMap.get(receiverId);
                     chatAdapter.addMessageList(messageItemList);
-                    recyclerViewMessages.scrollToPosition(messageItemList.size()-1);
+                    recyclerViewMessages.scrollToPosition(messageItemList.size()-1);*/
                 }
             }
 
@@ -115,7 +123,7 @@ public class ChatFragment extends Fragment {
         //  final String receiverUid = mUIDList.get(position);
 
         //receiver change listener
-        mRefUser.child(receiverUid).addValueEventListener(new ValueEventListener() {
+        mRefUser.child("message_center").child(receiverUid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 try {
@@ -209,4 +217,31 @@ public class ChatFragment extends Fragment {
         });
     }
 
+
+    private void sendMessageto(final User receiver, final String message , boolean isNew) {
+        String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "";
+        mRefUser.child("message_center").child(receiver.getUid()).child(sender.getUid()).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW));
+        mRefUser.child("message_center").child(sender.getUid()).child(receiver.getUid()).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW,true));
+
+ /*       //Get the MessageItem Map of Receiver
+        LinkedHashMap<String,List<MessageItem>> messageMap = receiver.getMessageMap() ;
+        LinkedHashMap<String,List<MessageItem>> senderMessageMap =sender.getMessageMap() ;
+
+        messageMap = messageMap==null? new LinkedHashMap<String, List<MessageItem>>() : messageMap ;
+        senderMessageMap = senderMessageMap==null? new LinkedHashMap<String, List<MessageItem>>() : senderMessageMap ;
+
+        //Get the Sender Uid block
+        List<MessageItem> messageItemList = messageMap.get(uid);
+        List<MessageItem> senderMessageItemList = senderMessageMap.get(receiver.getUid());
+
+        messageItemList = messageItemList==null ? new ArrayList<MessageItem>() : messageItemList ;
+        senderMessageItemList = senderMessageItemList==null ? new ArrayList<MessageItem>() : senderMessageItemList ;
+
+        messageItemList.add(new MessageItem(uid, message, timeStamp, MessageItem.NEW));
+        senderMessageItemList.add(new MessageItem(uid, message, timeStamp, MessageItem.NEW,true));
+
+        mRefUser.child("detaileduser_v1").child(receiver.getUid()).child("messageMap").child(uid).setValue(messageItemList);
+        mRefUser.child("detaileduser_v1").child(uid).child("messageMap").child(receiver.getUid()).setValue(senderMessageItemList);*/
+
+    }
 }
