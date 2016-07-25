@@ -28,6 +28,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -71,9 +72,12 @@ public class MessageFragment extends Fragment {
                 if (dataSnapshot != null && dataSnapshot.getValue() != null) {
 
                     for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                        HashMap<String,MessageItem> dataSnapshotValue = (HashMap<String, MessageItem>) postSnapshot.getValue();
-                        String k = postSnapshot.getKey() ;
-                        MessageItem  item = dataSnapshotValue.get("KNRZnY1sbpwiH6wNp5e");
+                        HashMap<String,MessageItem> dataSnapshotValue = (LinkedHashMap<String, MessageItem>) postSnapshot.getValue();
+                        Collection<MessageItem> messageItems = dataSnapshotValue.values() ;
+                        List<MessageItem> messageItemList = new ArrayList<MessageItem>();
+                        messageItemList.addAll(messageItems);
+                       String k = postSnapshot.getKey() ;
+                        /* MessageItem  item = dataSnapshotValue.get("KNRZnY1sbpwiH6wNp5e");
                         Log.i("message","");
                         String key = postSnapshot.getKey() ;
                         long count =  postSnapshot.getChildrenCount();
@@ -90,7 +94,7 @@ public class MessageFragment extends Fragment {
 
                             }
                         });
-
+*/
                     }
 
                  /*   User user = dataSnapshot.getValue(User.class);
