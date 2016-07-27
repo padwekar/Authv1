@@ -37,6 +37,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
     OnUserItemClickListener IOnItemClickListener ;
     LinkedHashMap<String,List<MessageItem>> messageMap ;
     Firebase mFireBaseRef ;
+    LinkedHashMap<User,MessageItem> userMessageItemLinkedHashMap ;
     public interface OnUserItemClickListener{
         void onItemClick(String receiverUID);
     }
@@ -54,9 +55,15 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
         mTypedArray = mContext.getResources().obtainTypedArray(R.array.avatars);
         this.isInboxList = isInboxList ;
         mFireBaseRef = new Firebase("https://todocloudsavi.firebaseio.com/");
+        userMessageItemLinkedHashMap = new LinkedHashMap<>();
 
     }
 
+
+    public void addTotheMap(User key , MessageItem messageItem){
+        this.userMessageItemLinkedHashMap.put(key,messageItem);
+        notifyDataSetChanged();
+    }
 
     public void addUserList(List<User> mUserList){
         this.mUserList.clear();
@@ -110,8 +117,9 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
                 Picasso.with(mContext).load(Uri.parse(mUserList.get(position).getProfileDownloadUri())).transform(new CircleTransform(Color.WHITE,5)).fit().into(holder.mImageView);
             holder.mTextviewName.setText(mUserList.get(position).getDisplayName());
             holder.mTextviewStatus.setText(mUserList.get(position).getStatus());
-        }else if(messageMap.size()>0 && mKeyUserMap.size()>0) {
+        }else {
            //
+
             User  sender =  mKeyUserMap.get(mUIDKeyList.get(position));
             if(sender!=null){
                 if(sender.getPicPosition()>=-0)
@@ -135,7 +143,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
     @Override
     public int getItemCount() {
         if(isInboxList)
-        return messageMap.size();
+        return userMessageItemLinkedHashMap.size();
         else
         return mUserList.size();
     }

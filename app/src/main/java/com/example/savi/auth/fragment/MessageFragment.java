@@ -78,15 +78,15 @@ public class MessageFragment extends Fragment {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for(DataSnapshot post : dataSnapshot.getChildren()){
                             final MessageItem item = post.getValue(MessageItem.class) ;
-                            if(userHashMap.containsKey(dataSnapshot.getKey()))
-                                itemLinkedHashMap.put(userHashMap.get(dataSnapshot.getKey()), item);
-                            else
+                            if(userHashMap.containsKey(dataSnapshot.getKey())){
+                                mAllUserAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
+                            }else{
                                 mFireBaseRef.child("detaileduser_v1").child(dataSnapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         User user = dataSnapshot.getValue(User.class);
-                                        userHashMap.put(dataSnapshot.getKey(), user);
-                                        itemLinkedHashMap.put(dataSnapshot.getValue(User.class), item);
+                                        userHashMap.put(dataSnapshot.getKey(),user);
+                                        mAllUserAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
                                     }
 
                                     @Override
@@ -94,6 +94,7 @@ public class MessageFragment extends Fragment {
 
                                     }
                                 });
+                            }
                         }
                     }
 
@@ -113,15 +114,15 @@ public class MessageFragment extends Fragment {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for(DataSnapshot post : dataSnapshot.getChildren()){
                             final MessageItem item = post.getValue(MessageItem.class) ;
-                            if(userHashMap.containsKey(dataSnapshot.getKey()))
-                                itemLinkedHashMap.put(userHashMap.get(dataSnapshot.getKey()), item);
-                            else
+                            if(userHashMap.containsKey(dataSnapshot.getKey())){
+                                mAllUserAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
+                            }else{
                                 mFireBaseRef.child("detaileduser_v1").child(dataSnapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         User user = dataSnapshot.getValue(User.class);
                                         userHashMap.put(dataSnapshot.getKey(),user);
-                                        itemLinkedHashMap.put(dataSnapshot.getValue(User.class), item);
+                                        mAllUserAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
                                     }
 
                                     @Override
@@ -129,6 +130,7 @@ public class MessageFragment extends Fragment {
 
                                     }
                                 });
+                            }
                         }
                     }
 
