@@ -1,6 +1,7 @@
 package com.example.savi.auth.fragment;
 
 import android.os.Bundle;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,6 +19,7 @@ import com.example.savi.auth.adapter.AllUserAdapter;
 import com.example.savi.auth.adapter.ChatAdapter;
 import com.example.savi.auth.model.MessageItem;
 import com.example.savi.auth.model.User;
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -48,13 +50,14 @@ public class MessageFragment extends Fragment {
     ChatAdapter mChatAdapter ;
     Firebase mFireBaseRef ;
     RecyclerView mRecyclerViewMessageList ;
+    Map<String,User> userHashMap ;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         View view  = inflater.inflate(R.layout.fragment_messages,container,false);
         Toast.makeText(getContext(),"In MessageFragment",Toast.LENGTH_SHORT).show();
         Firebase.setAndroidContext(getContext());
-
+        userHashMap = new HashMap<>();
         mChatAdapter = new ChatAdapter(getContext());
         mAllUserAdapter = new AllUserAdapter(getContext(),true);
         mFireBaseRef = new Firebase("https://todocloudsavi.firebaseio.com/");
@@ -64,50 +67,86 @@ public class MessageFragment extends Fragment {
         mRecyclerViewMessageList.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerViewMessageList.setAdapter(mAllUserAdapter);
 
+        final LinkedHashMap<User,MessageItem> itemLinkedHashMap = new LinkedHashMap<>();
         final Firebase mFireBaseRefnew = mFireBaseRef.child("message_center").child(uid) ;
-        mFireBaseRefnew.addValueEventListener(new ValueEventListener() {
+        mFireBaseRefnew.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                final Map<String, MessageItem> messageMap = new LinkedHashMap<String, MessageItem>();
-                if (dataSnapshot != null && dataSnapshot.getValue() != null) {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                final String key = dataSnapshot.getKey() ;
+                mFireBaseRefnew.child(key).limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot post : dataSnapshot.getChildren()){
+                            final MessageItem item = post.getValue(MessageItem.class) ;
+                            if(userHashMap.containsKey(dataSnapshot.getKey()))
+                                itemLinkedHashMap.put(userHashMap.get(dataSnapshot.getKey()), item);
+                            else
+                                mFireBaseRef.child("detaileduser_v1").child(dataSnapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        User user = dataSnapshot.getValue(User.class);
+                                        userHashMap.put(dataSnapshot.getKey(), user);
+                                        itemLinkedHashMap.put(dataSnapshot.getValue(User.class), item);
+                                    }
 
-                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                        HashMap<String,MessageItem> dataSnapshotValue = (LinkedHashMap<String, MessageItem>) postSnapshot.getValue();
-                        Collection<MessageItem> messageItems = dataSnapshotValue.values() ;
-                        List<MessageItem> messageItemList = new ArrayList<MessageItem>();
-                        messageItemList.addAll(messageItems);
-                       String k = postSnapshot.getKey() ;
-                        /* MessageItem  item = dataSnapshotValue.get("KNRZnY1sbpwiH6wNp5e");
-                        Log.i("message","");
-                        String key = postSnapshot.getKey() ;
-                        long count =  postSnapshot.getChildrenCount();
-                        Log.i("Count ",count+" , "+key);
-                        mFireBaseRefnew.child(key).addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                            MessageItem messageItem = dataSnapshot.getValue(MessageItem.class);
-                                Log.i("message",messageItem.getMessage());
-                            }
+                                    @Override
+                                    public void onCancelled(FirebaseError firebaseError) {
 
-                            @Override
-                            public void onCancelled(FirebaseError firebaseError) {
-
-                            }
-                        });
-*/
+                                    }
+                                });
+                        }
                     }
 
-                 /*   User user = dataSnapshot.getValue(User.class);
-                    if (user != null && user.getMessageMap() != null) {
-                        Map<String, List<MessageItem>> messageMap = user.getMessageMap();
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
 
-                        if (messageMap.containsKey(uid))
-                            messageMap.remove(uid);
+                    }
+                });
 
-                        mAllUserAdapter.addMessageMap(user.getMessageMap());
-                    }*/
+            }
 
-                }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                final String key = dataSnapshot.getKey() ;
+                mFireBaseRefnew.child(key).limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot post : dataSnapshot.getChildren()){
+                            final MessageItem item = post.getValue(MessageItem.class) ;
+                            if(userHashMap.containsKey(dataSnapshot.getKey()))
+                                itemLinkedHashMap.put(userHashMap.get(dataSnapshot.getKey()), item);
+                            else
+                                mFireBaseRef.child("detaileduser_v1").child(dataSnapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        User user = dataSnapshot.getValue(User.class);
+                                        userHashMap.put(dataSnapshot.getKey(),user);
+                                        itemLinkedHashMap.put(dataSnapshot.getValue(User.class), item);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(FirebaseError firebaseError) {
+
+                                    }
+                                });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                itemLinkedHashMap.remove(dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
             }
 
             @Override
