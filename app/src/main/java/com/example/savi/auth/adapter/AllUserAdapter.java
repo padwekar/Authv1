@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
     Map<String,User> mKeyUserMap ;
     boolean isInboxList ;
     Context mContext ;
+    List<User> keyList = new ArrayList<>();
     TypedArray mTypedArray ;
     OnUserItemClickListener IOnItemClickListener ;
     LinkedHashMap<String,List<MessageItem>> messageMap ;
@@ -61,8 +63,25 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
 
 
     public void addTotheMap(User key , MessageItem messageItem){
+
+        Log.w("Sender Name position ",key.getDisplayName()+"");
+        Log.w("Message ",messageItem.getMessage()+"");
+
+        /*if(this.userMessageItemLinkedHashMap.containsKey(key)){
+            this.keyList.remove(key);
+            this.userMessageIte
+        }*/
+
+        if(this.userMessageItemLinkedHashMap.containsKey(key)){
+            int keyposition  = keyList.indexOf(key);
+            userMessageItemLinkedHashMap.remove(key);
+            keyList.remove(keyposition);
+            notifyItemRemoved(keyposition);
+        }
         this.userMessageItemLinkedHashMap.put(key,messageItem);
-        notifyDataSetChanged();
+        keyList.add(0,key);
+        notifyItemInserted(0);
+  //      notifyDataSetChanged();
     }
 
     public void addUserList(List<User> mUserList){
@@ -118,9 +137,38 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
             holder.mTextviewName.setText(mUserList.get(position).getDisplayName());
             holder.mTextviewStatus.setText(mUserList.get(position).getStatus());
         }else {
-           //
 
-            User  sender =  mKeyUserMap.get(mUIDKeyList.get(position));
+            Log.w("onBindViewHold position",position+"");
+
+            User sender =  keyList.get(position);
+
+            Log.w("Sender Name position ",sender.getDisplayName()+"");
+            Log.w("HashmapSize ",userMessageItemLinkedHashMap.size()+"");
+            Log.w("keyListSize ",keyList.size()+"");
+
+
+            for(int i = 0 ; i < userMessageItemLinkedHashMap.size() ; i++){
+                Log.w("linkedhashmap ",userMessageItemLinkedHashMap.get(keyList.get(i)).getMessage()+"");
+
+            }
+
+            MessageItem messageItem = userMessageItemLinkedHashMap.get(sender);
+            if(sender!=null) {
+                if (sender.getPicPosition() >= -0)
+                    Picasso.with(mContext).load(mTypedArray.getResourceId(sender.getPicPosition(), 0)).transform(new CircleTransform(Color.WHITE, 5)).fit().into(holder.mImageView);
+                else
+                    Picasso.with(mContext).load(Uri.parse(sender.getProfileDownloadUri())).transform(new CircleTransform(Color.WHITE, 5)).fit().into(holder.mImageView);
+
+                holder.mTextviewName.setText(sender.getDisplayName());
+
+                if(messageItem.getSelf())
+                    holder.mTextviewStatus.setText("You : " + messageItem.getMessage());
+                else
+                    holder.mTextviewStatus.setText( sender.getEmail().substring(0,sender.getEmail().indexOf('@')) +" : " + messageItem.getMessage());
+            }
+                //
+
+            /*User  sender =  mKeyUserMap.get(mUIDKeyList.get(position));
             if(sender!=null){
                 if(sender.getPicPosition()>=-0)
                     Picasso.with(mContext).load(mTypedArray.getResourceId(sender.getPicPosition(),0)).transform(new CircleTransform(Color.WHITE,5)).fit().into(holder.mImageView);
@@ -134,7 +182,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
                 else
                 holder.mTextviewStatus.setText( sender.getEmail().substring(0,sender.getEmail().indexOf('@')) +" : " + msgList.get(msgList.size() - 1).getMessage());
 
-            }
+            }*/
 
         }
 

@@ -35,28 +35,35 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class MessageFragment extends Fragment {
-    List<String> mUIDList ;
-    List<User> mUserList ;
-    Map<String,User> allUserMap ;
+
+    private  List<String> mUIDList ;
+    private List<String> keyList ;
+    private List<User> mUserList ;
+    private Map<String,User> allUserMap ;
+    private Map<String,User> userHashMap ;
+
+
+    private User sender ;
+    private AllUserAdapter mAllUserAdapter  ;
+    private ChatAdapter mChatAdapter ;
+    private Firebase mFireBaseRef ;
+    private RecyclerView mRecyclerViewMessageList ;
 
     public static MessageFragment newInstance() {
         MessageFragment fragment = new MessageFragment();
         return fragment;
     }
-    User sender ;
-    AllUserAdapter mAllUserAdapter  ;
-    ChatAdapter mChatAdapter ;
-    Firebase mFireBaseRef ;
-    RecyclerView mRecyclerViewMessageList ;
-    Map<String,User> userHashMap ;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         View view  = inflater.inflate(R.layout.fragment_messages,container,false);
         Toast.makeText(getContext(),"In MessageFragment",Toast.LENGTH_SHORT).show();
         Firebase.setAndroidContext(getContext());
+        keyList = new ArrayList<>();
         userHashMap = new HashMap<>();
         mChatAdapter = new ChatAdapter(getContext());
         mAllUserAdapter = new AllUserAdapter(getContext(),true);
@@ -69,13 +76,17 @@ public class MessageFragment extends Fragment {
 
         final LinkedHashMap<User,MessageItem> itemLinkedHashMap = new LinkedHashMap<>();
         final Firebase mFireBaseRefnew = mFireBaseRef.child("message_center").child(uid) ;
+
+        //List of friend chat for that user
         mFireBaseRefnew.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+        Log.w("Now in","onChildAdded");
                 final String key = dataSnapshot.getKey() ;
-                mFireBaseRefnew.child(key).limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
+                mFireBaseRefnew.child(key).limitToLast(1).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+
                         for(DataSnapshot post : dataSnapshot.getChildren()){
                             final MessageItem item = post.getValue(MessageItem.class) ;
                             if(userHashMap.containsKey(dataSnapshot.getKey())){
@@ -107,15 +118,18 @@ public class MessageFragment extends Fragment {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            public void onChildChanged(DataSnapshot dataSnapshot, String s){
+                Log.w("Now in","onChildChange");
                 final String key = dataSnapshot.getKey() ;
-                mFireBaseRefnew.child(key).limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
+                mFireBaseRefnew.child(key).limitToLast(1).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+
                         for(DataSnapshot post : dataSnapshot.getChildren()){
                             final MessageItem item = post.getValue(MessageItem.class) ;
                             if(userHashMap.containsKey(dataSnapshot.getKey())){
                                 mAllUserAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
+                                break;
                             }else{
                                 mFireBaseRef.child("detaileduser_v1").child(dataSnapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
@@ -136,10 +150,12 @@ public class MessageFragment extends Fragment {
 
                     @Override
                     public void onCancelled(FirebaseError firebaseError) {
-
+                        Log.w("Now in","onChildChange");
                     }
                 });
+
             }
+
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
