@@ -236,6 +236,8 @@ public class AllUserFragment extends Fragment {
 
     private void sendMessageto(final User receiver, final String message , boolean isNew) {
         String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "";
+        mFireBaseRef.child("message_center").child(receiver.getUid()).child(sender.getUid()).setPriority(-System.currentTimeMillis());
+        mFireBaseRef.child("message_center").child(sender.getUid()).child(receiver.getUid()).setPriority(-System.currentTimeMillis());
         mFireBaseRef.child("message_center").child(receiver.getUid()).child(sender.getUid()).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW));
         mFireBaseRef.child("message_center").child(sender.getUid()).child(receiver.getUid()).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW,true));
         /*//Get the MessageItem Map of Receiver

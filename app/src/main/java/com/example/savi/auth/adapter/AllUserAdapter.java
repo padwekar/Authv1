@@ -64,6 +64,9 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
 
     public void addTotheMap(User key , MessageItem messageItem){
 
+        if(this.userMessageItemLinkedHashMap.containsValue(messageItem))
+                            return;
+
         Log.w("Sender Name position ",key.getDisplayName()+"");
         Log.w("Message ",messageItem.getMessage()+"");
 

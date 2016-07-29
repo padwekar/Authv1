@@ -2,6 +2,7 @@ package com.example.savi.auth.fragment;
 
 import android.os.Bundle;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -78,11 +79,12 @@ public class MessageFragment extends Fragment {
         final Firebase mFireBaseRefnew = mFireBaseRef.child("message_center").child(uid) ;
 
         //List of friend chat for that user
-        mFireBaseRefnew.addChildEventListener(new ChildEventListener() {
+        mFireBaseRefnew.orderByPriority().addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
         Log.w("Now in","onChildAdded");
                 final String key = dataSnapshot.getKey() ;
+
                 mFireBaseRefnew.child(key).limitToLast(1).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -120,7 +122,8 @@ public class MessageFragment extends Fragment {
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s){
                 Log.w("Now in","onChildChange");
-                final String key = dataSnapshot.getKey() ;
+                final String key = dataSnapshot.getKey() ;;
+                mFireBaseRefnew.removeEventListener(this);
                 mFireBaseRefnew.child(key).limitToLast(1).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
