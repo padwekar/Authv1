@@ -29,6 +29,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         messageItemList = new ArrayList<>();
     }
 
+    public void addMessage(MessageItem messageItem){
+        if(messageItemList.contains(messageItem))return;
+        messageItemList.add(messageItem);
+        notifyItemInserted(messageItemList.size()-1);
+    }
+
     public void addMessageList(List<MessageItem> messageItems){
         messageItemList.clear();
         messageItemList.addAll(messageItems);

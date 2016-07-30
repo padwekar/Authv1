@@ -18,63 +18,117 @@ import com.example.savi.auth.R;
 import com.example.savi.auth.adapter.AllUserAdapter;
 import com.example.savi.auth.model.MessageItem;
 import com.example.savi.auth.model.User;
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.example.savi.auth.utils.Constants.MESSAGE_CENTER;
+import static com.example.savi.auth.utils.Constants.TODOCLOUND_ROOT_FIREBASE_URL;
+import static com.example.savi.auth.utils.Constants.UID;
+import static com.example.savi.auth.utils.Constants.USER_DETAIL;
 
 public class AllUserFragment extends Fragment {
 
     public static AllUserFragment newInstance() {
-        AllUserFragment fragment = new AllUserFragment();
-        return fragment;
+        return new AllUserFragment();
     }
-    AllUserAdapter mAllUserAdapter ;
-    List<String> mUIDList ;
-    List<User>  mUserList ;
-    Firebase mFireBaseRef ;
-    ProgressBar mProgressBar ;
-    AllUserAdapter.OnUserItemClickListener IOnItemClickListener ;
-    User sender ;
 
-    String uid ;
+    private AllUserAdapter mAllUserAdapter;
+    private Firebase mFireBaseRef;
+    private Map<String, User> mKeyUserMap;
+    private User sender;
+
+    private ProgressBar mProgressBar;
+    private String uid;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_alluser,container,false);
-        mProgressBar = (ProgressBar)view.findViewById(R.id.progressbar);
-        mFireBaseRef = new Firebase("https://todocloudsavi.firebaseio.com/");
-        mFireBaseRef.child("message_center");
-        mAllUserAdapter = new AllUserAdapter(getContext(),false);
-        uid = getActivity().getIntent().getStringExtra("uid");
-        RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.recycler_view_alluser);
+
+        View view = inflater.inflate(R.layout.fragment_alluser, container, false);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.progressbar);
+
+        mFireBaseRef = new Firebase(TODOCLOUND_ROOT_FIREBASE_URL);
+        mFireBaseRef.child(MESSAGE_CENTER);
+        mAllUserAdapter = new AllUserAdapter(getContext(), false);
+        mKeyUserMap = new LinkedHashMap<>();
+        uid = getActivity().getIntent().getStringExtra(UID);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_alluser);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(mAllUserAdapter);
 
-        mFireBaseRef.child("detaileduser_v1").addValueEventListener(new ValueEventListener() {
+        mFireBaseRef.child(USER_DETAIL).orderByPriority().addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot != null && dataSnapshot.getValue() != null) {
-                    mUserList = new ArrayList<User>();
-                    mUIDList = new ArrayList<String>();
-                    for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
-                        User user =  postSnapshot.getValue(User.class) ;
-                        if(!user.getUid().equals(uid)){
-                            mUserList.add(user);
-                            mUIDList.add(user.getUid());
-                        }else  if(user.getUid().equals(uid)){
-                            sender = user ;
-                        }
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                mProgressBar.setVisibility(View.GONE);
+                final String key = dataSnapshot.getKey();
+                mFireBaseRef.child(USER_DETAIL).child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+
+                        if(uid.equals(user.getUid()))
+                            return;
+
+                        mKeyUserMap.put(user.getUid(), user);
+                        mAllUserAdapter.addUser(user);
                     }
-                    mAllUserAdapter.addUserList(mUserList);
-                }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+
+                    }
+                });
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                final String key = dataSnapshot.getKey();
+
+                mFireBaseRef.child(USER_DETAIL).child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+
+                        if(uid.equals(user.getUid()))
+                            return;
+
+                        mKeyUserMap.put(user.getUid(), user);
+                        mAllUserAdapter.addUser(user);
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                final String key = dataSnapshot.getKey();
+                mFireBaseRef.child(USER_DETAIL).child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
             }
 
@@ -82,22 +136,20 @@ public class AllUserFragment extends Fragment {
             public void onCancelled(FirebaseError firebaseError) {
 
             }
+
         });
-        Toast.makeText(getContext(), "In AllUserFragment", Toast.LENGTH_SHORT).show();
 
         mAllUserAdapter.setUserItemClickListener(new AllUserAdapter.OnUserItemClickListener() {
             @Override
             public void onItemClick(final String receiverUID) {
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                User receiver = new User(); ;
-                for(User user : mUserList){
-                    if(user.getUid().equals(receiverUID)){
-                        receiver = user ;
-                        break;
-                    }
-                }
+
+                User receiver = new User();
+                receiver = mKeyUserMap.get(receiverUID);
+
                 final String people = receiver.getDisplayName();
-                final User receiverInfo = receiver ;
+                final User receiverInfo = receiver;
                 builder.setTitle(people + " ")
                         .setItems(R.array.user_actions, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
@@ -112,8 +164,7 @@ public class AllUserFragment extends Fragment {
                                         public void onClick(DialogInterface dialog, int which) {
                                             if (!mEditText.getText().toString().equals("")) {
                                                 Toast.makeText(getContext(), "Sending", Toast.LENGTH_SHORT).show();
-                                             //   sendMessageto(receiverUID, mEditText.getText().toString());
-                                                sendMessageto(receiverInfo,mEditText.getText().toString(),true);
+                                                sendMessageto(receiverInfo, mEditText.getText().toString());
                                                 dialog.dismiss();
                                             }
                                         }
@@ -133,133 +184,26 @@ public class AllUserFragment extends Fragment {
                 builder.show();
             }
         });
-        return view ;
+        return view;
     }
 
-    private void sendMessageto(final String receiverUid, final String message) {
-      //  final String receiverUid = mUIDList.get(position);
 
-        //receiver change listener
-        mFireBaseRef.child("detaileduser_v1").child(receiverUid).addValueEventListener(new ValueEventListener() {
+    private void sendMessageto(final User receiver, final String message) {
+
+        final String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "" ;
+        mFireBaseRef.child(MESSAGE_CENTER).child(receiver.getUid()).child(uid).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW), new Firebase.CompletionListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                try {
-                    if(dataSnapshot!=null && dataSnapshot.getValue()!=null){
-
-                        User receiverInfo = dataSnapshot.getValue(User.class);
-
-                        //Get the receiver object as a String
-                        String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "";
-
-
-                        //Get the MessageItem Map of Receiver
-                        LinkedHashMap<String,List<MessageItem>> messageMap = receiverInfo.getMessageMap() ;
-                        messageMap = messageMap==null? new LinkedHashMap<String, List<MessageItem>>() : messageMap ;
-
-                        //Get the Sender Uid block
-                        List<MessageItem> messageItemList = messageMap.get(uid);
-                        messageItemList = messageItemList ==null ? new ArrayList<MessageItem>(): messageItemList;
-
-
-                        //Get Receiver UID block  from sender messages
-                       mFireBaseRef.child("user").child(uid).addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                String data = dataSnapshot.getValue().toString();
-                                String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "";
-
-                                //Convert it to receiver object
-                                User senderInfo = new Gson().fromJson(data, User.class);
-
-                                LinkedHashMap<String,List<MessageItem>> messageMap = senderInfo.getMessageMap() ;
-                                messageMap = messageMap==null? new LinkedHashMap<String, List<MessageItem>>() : messageMap ;
-                                List<MessageItem> messageItemList = messageMap.get(receiverUid);
-
-                                messageItemList = messageItemList ==null ? new ArrayList<MessageItem>(): messageItemList;
-                                messageItemList.add(new MessageItem(uid, message, timeStamp, MessageItem.NEW,true));
-
-                                //if Uid already exist delete it
-                                if(messageMap.containsKey(uid))
-                                    messageMap.remove(uid);
-
-                                //set rhe message to it
-                                messageMap.put(uid, messageItemList);
-                                senderInfo.setMessageMap(messageMap);
-
-                                String senderfinal = new Gson().toJson(senderInfo);
-
-                                mFireBaseRef.child("user").child(uid).setValue(senderfinal);
-                                mFireBaseRef.child("user").child(uid).removeEventListener(this);
-                                Toast.makeText(getContext(), "Self Data Fill Success", Toast.LENGTH_SHORT).show();
-
-                            }
-
-                            @Override
-                            public void onCancelled(FirebaseError firebaseError) {
-
-                            }
-                        });
-
-
-
-                        //Put the message in it
-                        messageItemList.add(new MessageItem(uid, message, timeStamp, MessageItem.NEW));
-
-                        //if Uid already exist delete it
-                        if(messageMap.containsKey(uid))
-                            messageMap.remove(uid);
-
-                        //set rhe message to it
-                        messageMap.put(uid, messageItemList);
-                        receiverInfo.setMessageMap(messageMap);
-
-                        String receiverfinal = new Gson().toJson(receiverInfo);
-
-                        mFireBaseRef.child("user").child(receiverUid).setValue(receiverfinal);
-                        mFireBaseRef.child("user").child(receiverUid).removeEventListener(this);
-
-                        Toast.makeText(getContext(), "Send Successful", Toast.LENGTH_SHORT).show();
-                    }
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                Toast.makeText(getContext(), "Message has been sent - 1", Toast.LENGTH_SHORT).show();
+                mFireBaseRef.child(MESSAGE_CENTER).child(receiver.getUid()).child(uid).setPriority(timeStamp);
             }
         });
-    }
-
-
-    private void sendMessageto(final User receiver, final String message , boolean isNew) {
-        String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "";
-        mFireBaseRef.child("message_center").child(receiver.getUid()).child(sender.getUid()).setPriority(-System.currentTimeMillis());
-        mFireBaseRef.child("message_center").child(sender.getUid()).child(receiver.getUid()).setPriority(-System.currentTimeMillis());
-        mFireBaseRef.child("message_center").child(receiver.getUid()).child(sender.getUid()).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW));
-        mFireBaseRef.child("message_center").child(sender.getUid()).child(receiver.getUid()).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW,true));
-        /*//Get the MessageItem Map of Receiver
-        LinkedHashMap<String,List<MessageItem>> messageMap = receiver.getMessageMap() ;
-        LinkedHashMap<String,List<MessageItem>> senderMessageMap =sender.getMessageMap() ;
-
-        messageMap = messageMap==null? new LinkedHashMap<String, List<MessageItem>>() : messageMap ;
-        senderMessageMap = senderMessageMap==null? new LinkedHashMap<String, List<MessageItem>>() : senderMessageMap ;
-
-        //Get the Sender Uid block
-        List<MessageItem> messageItemList = messageMap.get(uid);
-        List<MessageItem> senderMessageItemList = senderMessageMap.get(receiver.getUid());
-
-        messageItemList = messageItemList==null ? new ArrayList<MessageItem>() : messageItemList ;
-        senderMessageItemList = senderMessageItemList==null ? new ArrayList<MessageItem>() : senderMessageItemList ;
-
-        messageItemList.add(new MessageItem(uid, message, timeStamp, MessageItem.NEW));
-        senderMessageItemList.add(new MessageItem(uid, message, timeStamp, MessageItem.NEW,true));
-*/
-
-    //    mFireBaseRef.child("detaileduser_v1").child(receiver.getUid()).child("messageMap").child(uid).setValue(messageItemList);
-    //    mFireBaseRef.child("detaileduser_v1").child(uid).child("messageMap").child(receiver.getUid()).setValue(senderMessageItemList);
-
+        mFireBaseRef.child(MESSAGE_CENTER).child(uid).child(receiver.getUid()).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW, true), new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                Toast.makeText(getContext(), "Message has been sent - 2", Toast.LENGTH_SHORT).show();
+                mFireBaseRef.child(MESSAGE_CENTER).child(uid).child(receiver.getUid()).setPriority(timeStamp);
+            }
+        });
     }
 }

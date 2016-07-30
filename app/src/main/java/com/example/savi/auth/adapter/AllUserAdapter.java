@@ -31,7 +31,7 @@ import java.util.Map;
 public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserViewHolder> {
     List<String> mUIDKeyList ;
     List<User> mUserList ;
-    Map<String,User> mKeyUserMap ;
+    LinkedHashMap<String,User> mKeyUserMap ;
     boolean isInboxList ;
     Context mContext ;
     List<User> keyList = new ArrayList<>();
@@ -40,6 +40,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
     LinkedHashMap<String,List<MessageItem>> messageMap ;
     Firebase mFireBaseRef ;
     LinkedHashMap<User,MessageItem> userMessageItemLinkedHashMap ;
+
     public interface OnUserItemClickListener{
         void onItemClick(String receiverUID);
     }
@@ -48,10 +49,11 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
         this.IOnItemClickListener = IOnItemClickListener ;
     }
 
+
     public AllUserAdapter(Context mContext , boolean isInboxList) {
         mUIDKeyList = new ArrayList<>();
         mUserList = new ArrayList<>();
-        mKeyUserMap = new HashMap<>();
+        mKeyUserMap = new LinkedHashMap<>();
         messageMap = new LinkedHashMap<>();
         this.mContext = mContext ;
         mTypedArray = mContext.getResources().obtainTypedArray(R.array.avatars);
@@ -62,42 +64,14 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
     }
 
 
-    public void addTotheMap(User key , MessageItem messageItem){
 
-        if(this.userMessageItemLinkedHashMap.containsValue(messageItem))
-                            return;
-
-        Log.w("Sender Name position ",key.getDisplayName()+"");
-        Log.w("Message ",messageItem.getMessage()+"");
-
-        /*if(this.userMessageItemLinkedHashMap.containsKey(key)){
-            this.keyList.remove(key);
-            this.userMessageIte
-        }*/
-
-        if(this.userMessageItemLinkedHashMap.containsKey(key)){
-            int keyposition  = keyList.indexOf(key);
-            userMessageItemLinkedHashMap.remove(key);
-            keyList.remove(keyposition);
-            notifyItemRemoved(keyposition);
-        }
-        this.userMessageItemLinkedHashMap.put(key,messageItem);
-        keyList.add(0,key);
-        notifyItemInserted(0);
-  //      notifyDataSetChanged();
-    }
-
-    public void addUserList(List<User> mUserList){
-        this.mUserList.clear();
-        this.mUserList.addAll(mUserList);
-        notifyDataSetChanged();
-    }
-
-    public void addKeyUserMapp (Map<String,User> mKeyUserMap){
+   /* public void addKeyUserMapp (Map<String,User> mKeyUserMap){
         this.mKeyUserMap.clear();
         this.mKeyUserMap.putAll(mKeyUserMap);
         notifyDataSetChanged();
     }
+   */
+/*
     public void addMessageMap( Map<String,List<MessageItem>> messageMap){
         this.messageMap.clear();
      //   this.messageMap.putAll(messageMap);
@@ -108,7 +82,9 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
         setKeySet(this.messageMap);
         notifyDataSetChanged();
     }
+*/
 
+/*
 
     private void setKeySet(Map<String,List<MessageItem>> messageMap) {
         mUIDKeyList.clear();
@@ -116,10 +92,41 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
             mUIDKeyList.add(key);
         }
     }
+*/
 
-    public void addItem(User user){
-        mUserList.add(user);
+    public void addUser(User user){
+
+        String uid = user.getUid() ;
+
+        if(mKeyUserMap.containsKey(uid)){
+            int keyposition  = mUserList.indexOf(mKeyUserMap.get(uid));
+            User userItem =  mKeyUserMap.get(uid);
+            mKeyUserMap.remove(uid);
+            mUserList.remove(userItem);
+            notifyItemRemoved(keyposition);
+        }
+
+        mKeyUserMap.put(uid,user);
+        mUserList.add(0,user);
         notifyItemInserted(0);
+
+    }
+
+    public void addTotheMap(User key , MessageItem messageItem){
+
+        if(this.userMessageItemLinkedHashMap.containsValue(messageItem))
+            return;
+
+        if(this.userMessageItemLinkedHashMap.containsKey(key)){
+            int keyposition  = keyList.indexOf(key);
+            userMessageItemLinkedHashMap.remove(key);
+            keyList.remove(keyposition);
+            notifyItemRemoved(keyposition);
+        }
+        this.userMessageItemLinkedHashMap.put(key, messageItem);
+        keyList.add(0, key);
+        notifyItemInserted(0);
+
     }
 
 
@@ -141,19 +148,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
             holder.mTextviewStatus.setText(mUserList.get(position).getStatus());
         }else {
 
-            Log.w("onBindViewHold position",position+"");
-
             User sender =  keyList.get(position);
-
-            Log.w("Sender Name position ",sender.getDisplayName()+"");
-            Log.w("HashmapSize ",userMessageItemLinkedHashMap.size()+"");
-            Log.w("keyListSize ",keyList.size()+"");
-
-
-            for(int i = 0 ; i < userMessageItemLinkedHashMap.size() ; i++){
-                Log.w("linkedhashmap ",userMessageItemLinkedHashMap.get(keyList.get(i)).getMessage()+"");
-
-            }
 
             MessageItem messageItem = userMessageItemLinkedHashMap.get(sender);
             if(sender!=null) {
@@ -169,27 +164,10 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
                 else
                     holder.mTextviewStatus.setText( sender.getEmail().substring(0,sender.getEmail().indexOf('@')) +" : " + messageItem.getMessage());
             }
-                //
-
-            /*User  sender =  mKeyUserMap.get(mUIDKeyList.get(position));
-            if(sender!=null){
-                if(sender.getPicPosition()>=-0)
-                    Picasso.with(mContext).load(mTypedArray.getResourceId(sender.getPicPosition(),0)).transform(new CircleTransform(Color.WHITE,5)).fit().into(holder.mImageView);
-                else
-                    Picasso.with(mContext).load(Uri.parse(sender.getProfileDownloadUri())).transform(new CircleTransform(Color.WHITE,5)).fit().into(holder.mImageView);
-
-                holder.mTextviewName.setText(sender.getDisplayName());
-                List<MessageItem> msgList = messageMap.get(sender.getUid()) ;
-                if(msgList.get(msgList.size() - 1).getSelf())
-                holder.mTextviewStatus.setText("You : " + msgList.get(msgList.size() - 1).getMessage());
-                else
-                holder.mTextviewStatus.setText( sender.getEmail().substring(0,sender.getEmail().indexOf('@')) +" : " + msgList.get(msgList.size() - 1).getMessage());
-
-            }*/
-
         }
 
     }
+
 
     @Override
     public int getItemCount() {
@@ -211,10 +189,13 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(!isInboxList)
+                    if(!isInboxList){
                         IOnItemClickListener.onItemClick(mUserList.get(getAdapterPosition()).getUid());
-                    else
-                        IOnItemClickListener.onItemClick(mKeyUserMap.get(mUIDKeyList.get(getAdapterPosition())).getUid());
+                    }
+                    else{
+                        IOnItemClickListener.onItemClick(keyList.get(getAdapterPosition()).getUid());
+
+                    }
                 }
             });
         }

@@ -11,4 +11,10 @@ public class Constants {
     public final static int SUCCESS_IMAGE_UPLOAD  = 5 ;
     public final static int FAIL_IMAGE_UPLOAD  = 1 ;
     public final static int SUCCESS_USER_VALUE_SET = 3 ;
+
+    public final static String TODOCLOUND_ROOT_FIREBASE_URL = "https://todocloudsavi.firebaseio.com/" ;
+    public final static String MESSAGE_CENTER = "message_center" ;
+    public final static String USER_DETAIL = "detaileduser_v1";
+    public final static String UID = "uid";
+
 }

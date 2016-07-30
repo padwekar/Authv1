@@ -78,27 +78,41 @@ public class MessageFragment extends Fragment {
         final LinkedHashMap<User,MessageItem> itemLinkedHashMap = new LinkedHashMap<>();
         final Firebase mFireBaseRefnew = mFireBaseRef.child("message_center").child(uid) ;
 
+
+        mFireBaseRefnew.orderByPriority().addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+            }
+
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
         //List of friend chat for that user
         mFireBaseRefnew.orderByPriority().addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-        Log.w("Now in","onChildAdded");
-                final String key = dataSnapshot.getKey() ;
+                Log.w("Now in", "onChildAdded");
+                final String key = dataSnapshot.getKey();
 
                 mFireBaseRefnew.child(key).limitToLast(1).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        for(DataSnapshot post : dataSnapshot.getChildren()){
-                            final MessageItem item = post.getValue(MessageItem.class) ;
-                            if(userHashMap.containsKey(dataSnapshot.getKey())){
+                        for (DataSnapshot post : dataSnapshot.getChildren()) {
+                            final MessageItem item = post.getValue(MessageItem.class);
+                            if (userHashMap.containsKey(dataSnapshot.getKey())) {
                                 mAllUserAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
-                            }else{
+                            } else {
                                 mFireBaseRef.child("detaileduser_v1").child(dataSnapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         User user = dataSnapshot.getValue(User.class);
-                                        userHashMap.put(dataSnapshot.getKey(),user);
+                                        userHashMap.put(dataSnapshot.getKey(), user);
                                         mAllUserAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
                                     }
 
@@ -120,25 +134,26 @@ public class MessageFragment extends Fragment {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s){
-                Log.w("Now in","onChildChange");
-                final String key = dataSnapshot.getKey() ;;
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Log.w("Now in", "onChildChange");
+                final String key = dataSnapshot.getKey();
+                ;
                 mFireBaseRefnew.removeEventListener(this);
                 mFireBaseRefnew.child(key).limitToLast(1).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        for(DataSnapshot post : dataSnapshot.getChildren()){
-                            final MessageItem item = post.getValue(MessageItem.class) ;
-                            if(userHashMap.containsKey(dataSnapshot.getKey())){
+                        for (DataSnapshot post : dataSnapshot.getChildren()) {
+                            final MessageItem item = post.getValue(MessageItem.class);
+                            if (userHashMap.containsKey(dataSnapshot.getKey())) {
                                 mAllUserAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
                                 break;
-                            }else{
+                            } else {
                                 mFireBaseRef.child("detaileduser_v1").child(dataSnapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         User user = dataSnapshot.getValue(User.class);
-                                        userHashMap.put(dataSnapshot.getKey(),user);
+                                        userHashMap.put(dataSnapshot.getKey(), user);
                                         mAllUserAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
                                     }
 
@@ -153,7 +168,7 @@ public class MessageFragment extends Fragment {
 
                     @Override
                     public void onCancelled(FirebaseError firebaseError) {
-                        Log.w("Now in","onChildChange");
+                        Log.w("Now in", "onChildChange");
                     }
                 });
 
@@ -177,7 +192,7 @@ public class MessageFragment extends Fragment {
         });
 
 
-        mFireBaseRef.child("detaileduser_v1").addValueEventListener(new ValueEventListener() {
+   /*     mFireBaseRef.child("detaileduser_v1").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot != null && dataSnapshot.getValue() != null) {
@@ -204,11 +219,11 @@ public class MessageFragment extends Fragment {
             public void onCancelled(FirebaseError firebaseError) {
 
             }
-        });
+        });*/
         mAllUserAdapter.setUserItemClickListener(new AllUserAdapter.OnUserItemClickListener() {
             @Override
             public void onItemClick(String receiverUID) {
-                setFragment(ChatFragment.newInstance(receiverUID,allUserMap));
+                setFragment(ChatFragment.newInstance(userHashMap.get(receiverUID)));
             }
         });
 

@@ -53,6 +53,7 @@ import java.io.File;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ProfileFragment extends Fragment {
 
@@ -153,7 +154,6 @@ public class ProfileFragment extends Fragment {
 
                         case Constants.SUCCESS_IMAGE_UPLOAD :
                                  syncData();
-                                 Toast.makeText(getActivity(),"Success_upload",Toast.LENGTH_SHORT).show(); break;
 
                         case Constants.FAIL_IMAGE_UPLOAD :
                             Toast.makeText(getActivity(),"Fail_upload",Toast.LENGTH_SHORT).show(); break;
@@ -218,7 +218,14 @@ public class ProfileFragment extends Fragment {
         user.setUid(uid);
         user.setProfileDownloadUri(imageUri);
 
-        mRef.child("detaileduser_v1").child(uid).setValue(user);
+        mRef.child("detaileduser_v1").child(uid).setValue(user, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                Toast.makeText(getContext(),"Database Updated",Toast.LENGTH_SHORT).show();
+                mRef.child("detaileduser_v1").child(uid).setPriority(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+            }
+
+        });
         mProgressbar.setVisibility(View.GONE);
 
 /*
