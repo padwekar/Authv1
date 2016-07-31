@@ -32,11 +32,7 @@ public class MessageItem {
     }
 
     public MessageItem(String senderUid, String message, String timeStamp, int status) {
-        this.message = message;
-        this.timeStamp = timeStamp;
-        this.status = status;
-        this.senderUid = senderUid ;
-        this.self  = false ;
+       this(senderUid,message,timeStamp,status,false);
     }
 
     public MessageItem(String senderUid, String message, String timeStamp, int status, boolean isSelf) {

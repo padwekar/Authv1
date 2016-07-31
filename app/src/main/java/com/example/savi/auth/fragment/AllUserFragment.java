@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.example.savi.auth.utils.Constants.MESSAGE_CENTER;
-import static com.example.savi.auth.utils.Constants.TODOCLOUND_ROOT_FIREBASE_URL;
+import static com.example.savi.auth.utils.Constants.TODOCLOUD_ROOT_FIREBASE_URL;
 import static com.example.savi.auth.utils.Constants.UID;
 import static com.example.savi.auth.utils.Constants.USER_DETAIL;
 
@@ -54,7 +54,7 @@ public class AllUserFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_alluser, container, false);
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressbar);
 
-        mFireBaseRef = new Firebase(TODOCLOUND_ROOT_FIREBASE_URL);
+        mFireBaseRef = new Firebase(TODOCLOUD_ROOT_FIREBASE_URL);
         mFireBaseRef.child(MESSAGE_CENTER);
         mAllUserAdapter = new AllUserAdapter(getContext(), false);
         mKeyUserMap = new LinkedHashMap<>();
