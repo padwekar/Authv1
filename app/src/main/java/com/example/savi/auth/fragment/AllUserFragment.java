@@ -40,7 +40,7 @@ public class AllUserFragment extends Fragment {
     }
 
     private AllUserAdapter mAllUserAdapter;
-    private Firebase mFireBaseRef;
+    private Firebase mFireBaseRef , mFireBaseMsgCenter;
     private Map<String, User> mKeyUserMap;
     private User sender;
 
@@ -55,7 +55,7 @@ public class AllUserFragment extends Fragment {
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressbar);
 
         mFireBaseRef = new Firebase(TODOCLOUD_ROOT_FIREBASE_URL);
-        mFireBaseRef.child(MESSAGE_CENTER);
+        mFireBaseMsgCenter = mFireBaseRef.child(MESSAGE_CENTER);
         mAllUserAdapter = new AllUserAdapter(getContext(), false);
         mKeyUserMap = new LinkedHashMap<>();
         uid = getActivity().getIntent().getStringExtra(UID);
@@ -164,7 +164,7 @@ public class AllUserFragment extends Fragment {
                                         public void onClick(DialogInterface dialog, int which) {
                                             if (!mEditText.getText().toString().equals("")) {
                                                 Toast.makeText(getContext(), "Sending", Toast.LENGTH_SHORT).show();
-                                                sendMessageto(receiverInfo, mEditText.getText().toString());
+                                                sendMessageto(receiverInfo, mEditText.getText().toString(),false);
                                                 dialog.dismiss();
                                             }
                                         }
@@ -188,20 +188,25 @@ public class AllUserFragment extends Fragment {
     }
 
 
-    private void sendMessageto(final User receiver, final String message) {
+    private void sendMessageto(final User receiver, final String message , boolean isNew) {
+
+
+        Firebase mRefUserTemp = mFireBaseMsgCenter.child(uid).child(receiver.getUid()).push() ;
+        String key = mRefUserTemp.getKey() ;
 
         final String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "" ;
-        mFireBaseRef.child(MESSAGE_CENTER).child(receiver.getUid()).child(uid).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW), new Firebase.CompletionListener() {
+        mFireBaseMsgCenter.child(receiver.getUid()).child(uid).push() .setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW, key, false), new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                Toast.makeText(getContext(), "Message has been sent - 1", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Message has been Sent", Toast.LENGTH_SHORT).show();
                 mFireBaseRef.child(MESSAGE_CENTER).child(receiver.getUid()).child(uid).setPriority(timeStamp);
             }
         });
-        mFireBaseRef.child(MESSAGE_CENTER).child(uid).child(receiver.getUid()).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW, true), new Firebase.CompletionListener() {
+
+        mRefUserTemp.setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW,key, true), new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                Toast.makeText(getContext(), "Message has been sent - 2", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Message has been Delivered", Toast.LENGTH_SHORT).show();
                 mFireBaseRef.child(MESSAGE_CENTER).child(uid).child(receiver.getUid()).setPriority(timeStamp);
             }
         });

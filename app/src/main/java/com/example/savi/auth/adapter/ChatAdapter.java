@@ -73,7 +73,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if(holder.getItemViewType()== MessageItem.SELF_MESSAGE){
             ChatSelfViewHolder selfViewHolder = (ChatSelfViewHolder)holder;
-            selfViewHolder.textViewSelfMessage.setText(messageItemList.get(position).getMessage());
+            selfViewHolder.textViewSelfMessage.setText(messageItemList.get(position).getMessage() + "  -"+ messageItemList.get(position).getStatus());
             long time = Long.parseLong(messageItemList.get(position).getTimeStamp()) ;
             String times = DateUtils.getFormattedString(time*1000, DateUtils.DATE_TIME_FORMAT_TYPE_HH_mm);
             String date = DateUtils.getFormattedString(time*1000, DateUtils.DATE_TIME_FORMAT_TYPE_dd_MM_yyyy);

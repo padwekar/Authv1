@@ -30,8 +30,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static com.example.savi.auth.utils.Constants.MESSAGE_CENTER;
@@ -225,6 +227,16 @@ public class ChatFragment extends Fragment {
                     if (!messageItemList.contains(messageItem))
                         messageItemList.add(messageItem);
 
+                   /* if(!messageItem.getSelf()){
+                        messageItem.setStatus(MessageItem.READ);
+                        Map<String,Object> hashMap = new HashMap<String, Object>();
+                        hashMap.put("status",0);
+                        String uidtemp = uid ;
+                        String recUid = receiver.getUid() ;
+                        String branchkey = messageItem.getSenderBranchKey() ;
+                        mRefUser.child(uid).child(receiver.getUid()).child(messageItem.getSenderBranchKey()).updateChildren(hashMap);
+                    }*/
+
                     chatAdapter.addMessage(messageItem);
                     recyclerViewMessages.scrollToPosition(chatAdapter.getItemCount());
                 }
@@ -257,9 +269,12 @@ public class ChatFragment extends Fragment {
 
     private void sendMessageto(final User receiver, final String message , boolean isNew) {
 
-        final String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "" ;
 
-        mRefUser.child(receiver.getUid()).child(uid).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW), new Firebase.CompletionListener() {
+        Firebase mRefUserTemp = mRefUser.child(uid).child(receiver.getUid()).push() ;
+        String key = mRefUserTemp.getKey() ;
+
+        final String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "" ;
+        mRefUser.child(receiver.getUid()).child(uid).push() .setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW, key, false), new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                 Toast.makeText(getContext(), "Message has been Sent", Toast.LENGTH_SHORT).show();
@@ -267,7 +282,7 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        mRefUser.child(uid).child(receiver.getUid()).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW, true), new Firebase.CompletionListener() {
+        mRefUserTemp.setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW, key, true), new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                 Toast.makeText(getContext(), "Message has been Delivered", Toast.LENGTH_SHORT).show();

@@ -21,8 +21,10 @@ public class MessageItem {
     public final static int READ = 2 ;
 
     String senderUid ;
+    String senderBranchKey ;
     String message ;
     String timeStamp ;
+
 
     boolean self ;
     int status ;
@@ -35,14 +37,28 @@ public class MessageItem {
        this(senderUid,message,timeStamp,status,false);
     }
 
+
     public MessageItem(String senderUid, String message, String timeStamp, int status, boolean isSelf) {
+        this(senderUid,message,timeStamp,status,"",isSelf);
+
+    }
+
+    public MessageItem(String senderUid, String message, String timeStamp, int status,String senderBranchKey, boolean isSelf) {
         this.message = message;
         this.timeStamp = timeStamp;
         this.status = status;
         this.senderUid = senderUid ;
         this.self  = isSelf ;
+        this.senderBranchKey = senderBranchKey;
     }
 
+    public String getSenderBranchKey() {
+        return senderBranchKey;
+    }
+
+    public void setSenderBranchKey(String senderBranchKey) {
+        this.senderBranchKey = senderBranchKey;
+    }
 
     public boolean getSelf() {
         return self;
