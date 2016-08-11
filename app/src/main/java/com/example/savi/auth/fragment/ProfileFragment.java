@@ -100,7 +100,7 @@ public class ProfileFragment extends Fragment {
         mFirebaseStorage = FirebaseStorage.getInstance();
         mStorageReference = mFirebaseStorage.getReferenceFromUrl("gs://todocloudsavi.appspot.com/");
 
-        Toast.makeText(getContext(),"In ProfileFragment",Toast.LENGTH_SHORT).show();
+         Toast.makeText(getContext(),"In ProfileFragment",Toast.LENGTH_SHORT).show();
 
         mEdittextDisplayName = (EditText)view.findViewById(R.id.edittext_displayname);
         mEdittextDisplayName.setText(mFireBaseUserRef.getAuth().getProviderData().get("email").toString());
@@ -159,7 +159,7 @@ public class ProfileFragment extends Fragment {
                             Toast.makeText(getActivity(),"Fail_upload",Toast.LENGTH_SHORT).show(); break;
 
                     }
-                }
+            }
             }
         };
 

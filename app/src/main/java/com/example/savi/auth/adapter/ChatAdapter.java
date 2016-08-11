@@ -38,9 +38,24 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void addMessage(MessageItem messageItem,int position){
         if(messageItemList.contains(messageItem))return;
         messageItemList.add(position,messageItem);
-
         notifyItemInserted(position);
     }
+
+    public void updateMessage(MessageItem messageItem){
+        MessageItem tempItem = new MessageItem();
+        for(MessageItem Item : messageItemList){
+            if(Item.getSenderBranchKey().equals(messageItem.getSenderBranchKey())){
+                tempItem = Item ; break;
+            }
+        }
+
+        int position = messageItemList.indexOf(tempItem);
+        messageItemList.set(position,messageItem);
+        notifyItemChanged(position);
+
+
+    }
+
     public void addMessageList(List<MessageItem> messageItems){
         messageItemList.clear();
         messageItemList.addAll(messageItems);

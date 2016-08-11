@@ -90,6 +90,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager() ;
+        fragmentManager.popBackStackImmediate();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout,fragment);
         fragmentTransaction.commit();
@@ -99,4 +100,6 @@ public class HomeActivity extends AppCompatActivity {
     public void onBackPressed() {
 
     }
+
+
 }

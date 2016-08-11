@@ -158,7 +158,7 @@ public class MessageFragment extends Fragment {
                                     }
 
                                     @Override
-                                    public void onCancelled(FirebaseError firebaseError) {
+                                     public void onCancelled(FirebaseError firebaseError) {
 
                                     }
                                 });

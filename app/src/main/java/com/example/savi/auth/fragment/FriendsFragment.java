@@ -22,6 +22,6 @@ public class FriendsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friends,container,false);
         Toast.makeText(getContext(),"In Friends Fragment",Toast.LENGTH_SHORT).show();
-        return view ;
+        return view  ;
     }
 }

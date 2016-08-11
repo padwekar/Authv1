@@ -34,12 +34,12 @@ public class MessageItem {
     }
 
     public MessageItem(String senderUid, String message, String timeStamp, int status) {
-       this(senderUid,message,timeStamp,status,false);
+        this(senderUid,message,timeStamp,status,false);
     }
 
 
     public MessageItem(String senderUid, String message, String timeStamp, int status, boolean isSelf) {
-        this(senderUid,message,timeStamp,status,"",isSelf);
+        this(senderUid,message,timeStamp,status,"xxx",isSelf);
 
     }
 

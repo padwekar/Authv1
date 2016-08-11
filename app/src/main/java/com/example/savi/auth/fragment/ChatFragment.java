@@ -30,10 +30,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static com.example.savi.auth.utils.Constants.MESSAGE_CENTER;
@@ -49,14 +47,13 @@ public class ChatFragment extends Fragment {
     private EditText mEditTextMessageInput ;
     private List<MessageItem> messageItemList ;
     private String firstElementKey ;
-    private int position = 0;
+    private int position = 0 ;
     private Button mButtonShowMore ;
     private boolean isDataAvailable = true;
     private ImageView imageViewUpArrow ;
     private ImageView imageViewDownArrow ;
     private TextView textviewNewMessages ;
     private  LinearLayoutManager mLayoutManager ;
-
     public static ChatFragment newInstance(User receiver) {
         ChatFragment fragment = new ChatFragment();
         fragment.receiver = receiver ;
@@ -93,7 +90,7 @@ public class ChatFragment extends Fragment {
         mTextviewReceiver.setText(receiver.getDisplayName());
 
         mLayoutManager = new LinearLayoutManager(getActivity());
-
+        mLayoutManager.setStackFromEnd(true);
         mButtonShowMore = (Button)view.findViewById(R.id.button_show_more);
         mEditTextMessageInput = (EditText)view.findViewById(R.id.edittext_inputmsg);
         chatAdapter = new ChatAdapter(getContext());
@@ -216,6 +213,7 @@ public class ChatFragment extends Fragment {
         mRefUser.child(uid).child(receiver.getUid()).limitToLast(20).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Log.i("ChildAdded" ,"inside");
                 if (dataSnapshot != null) {
                     if (firstElementKey == null) {
                         firstElementKey = dataSnapshot.getKey();
@@ -224,27 +222,30 @@ public class ChatFragment extends Fragment {
                     }
 
                     MessageItem messageItem = dataSnapshot.getValue(MessageItem.class);
-                    if (!messageItemList.contains(messageItem))
+                    if (!messageItemList.contains(messageItem)){
                         messageItemList.add(messageItem);
 
-                   /* if(!messageItem.getSelf()){
-                        messageItem.setStatus(MessageItem.READ);
-                        Map<String,Object> hashMap = new HashMap<String, Object>();
-                        hashMap.put("status",0);
-                        String uidtemp = uid ;
-                        String recUid = receiver.getUid() ;
-                        String branchkey = messageItem.getSenderBranchKey() ;
-                        mRefUser.child(uid).child(receiver.getUid()).child(messageItem.getSenderBranchKey()).updateChildren(hashMap);
-                    }*/
+                        if(!messageItem.getSelf()){
+                            messageItem.setStatus(MessageItem.READ);
+                            mRefUser.child(receiver.getUid()).child(uid).child(messageItem.getSenderBranchKey()).child("status").setValue(2);
+                        }
 
-                    chatAdapter.addMessage(messageItem);
-                    recyclerViewMessages.scrollToPosition(chatAdapter.getItemCount());
+                        chatAdapter.addMessage(messageItem);
+                        int count = chatAdapter.getItemCount()-1 ;
+                        recyclerViewMessages.scrollToPosition(count);
+                        Log.i("Scrolled to" ,""+count);
+
+                        //   mLayoutManager.scrollToPosition(chatAdapter.getItemCount());
+                    }
                 }
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                Log.i("ChildChanged" ,"inside");
+                MessageItem messageItem = dataSnapshot.getValue(MessageItem.class);
+                chatAdapter.updateMessage(messageItem);
+                recyclerViewMessages.scrollToPosition(chatAdapter.getItemCount());
             }
 
             @Override
