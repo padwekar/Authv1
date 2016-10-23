@@ -17,8 +17,8 @@ public class MessageItem {
     public final static int RESPONSE_MESSAGE = 1 ;
 
     public final static int NEW = 0 ;
-    public final static int UNREAD = 1 ;
-    public final static int READ = 2 ;
+    public final static int SENT = 1 ;
+    public final static int DELIVERED = 2 ;
 
     String senderUid ;
     String senderBranchKey ;
@@ -28,6 +28,19 @@ public class MessageItem {
 
     boolean self ;
     int status ;
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof MessageItem){
+            if(((MessageItem) o).senderBranchKey.equals(senderBranchKey))
+                return true ;
+            else
+                return false ;
+        }else {
+            super.equals(o);
+        }
+        return false ;
+    }
 
     public MessageItem(){
 

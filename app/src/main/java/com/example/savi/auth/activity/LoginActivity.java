@@ -2,9 +2,9 @@ package com.example.savi.auth.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
+import com.example.savi.auth.utils.AuthPreferences;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -27,8 +28,11 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         Firebase.setAndroidContext(this);
         setContentView(R.layout.activity_login);
+
         mRef= new Firebase("https://todocloudsavi.firebaseio.com/");
         mProgressBar = (ProgressBar)findViewById(R.id.progressbar);
         mProgressBar.setVisibility(View.GONE);
@@ -81,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
         AuthData authData = mRef.getAuth();
         if(authData!=null){
             uid = authData.getUid() ;
-            startLoginActivity(uid);
+            startHomeActivity(uid);
         }
 
         buttonLogIn.setOnClickListener(new View.OnClickListener() {
@@ -94,7 +98,7 @@ public class LoginActivity extends AppCompatActivity {
                         mProgressBar.setVisibility(View.GONE);
                         uid = authData.getUid() ;
                         Toast.makeText(getBaseContext(), authData.toString(), Toast.LENGTH_SHORT).show();
-                        startLoginActivity(uid);
+                        startHomeActivity(uid);
                     }
 
                     @Override
@@ -114,8 +118,10 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void startLoginActivity(String uid) {
+    private void startHomeActivity(String uid) {
         Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
+        AuthPreferences.getInstance().setLoginStatus(true);
+        AuthPreferences.getInstance().setUserUid(uid);
         intent.putExtra("uid",uid);
         startActivity(intent);
     }

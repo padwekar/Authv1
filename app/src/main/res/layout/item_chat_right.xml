@@ -12,20 +12,40 @@
         android:background="@drawable/background_chat_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_gravity="end"
+        >
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="end">
 
         <TextView
+            android:text="Hello bc"
             android:id="@+id/textview_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="start"
             android:textSize="16sp" />
 
+            <ImageView
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@id/textview_msg"
+                android:id="@+id/imageview_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_check_all_grey600_18dp"
+                />
+
+        </RelativeLayout>
         <TextView
             android:id="@+id/textview_msg_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:textSize="10sp"
+            android:text="12-09-201687f9879797980"
             android:layout_gravity="bottom|end"
             android:textColor="@android:color/holo_blue_light"
             />

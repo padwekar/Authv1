@@ -1,43 +1,55 @@
 package com.example.savi.auth.activity;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.RadioButton;
+import android.util.Log;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
+import com.example.savi.auth.constant.IntentConstant;
 import com.example.savi.auth.fragment.AllUserFragment;
 import com.example.savi.auth.fragment.FriendsFragment;
 import com.example.savi.auth.fragment.MessageFragment;
 import com.example.savi.auth.fragment.ProfileFragment;
-import com.example.savi.auth.model.ToDoItem;
-import com.firebase.client.DataSnapshot;
+import com.example.savi.auth.service.InstanceIdService;
+import com.example.savi.auth.service.NotificationHandlerService;
+import com.example.savi.auth.utils.AuthPreferences;
 import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
-    Firebase mRef, mFirebaseRefAllUser;
-    List<String> allUserList;
-    String uid ;
-    TextView textViewLogOut ;
+
+    private TextView textViewLogOut ;
+
+    private Firebase mRef, mFirebaseRefAllUser;
+    private List<String> allUserList = new ArrayList<>();;
+    private String uid ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Firebase.setAndroidContext(getBaseContext());
         setContentView(R.layout.activity_dashboard);
+
+        mRef = new Firebase("https://todocloudsavi.firebaseio.com/user");
         uid = getIntent().getStringExtra("uid");
+
+        startService(new Intent(this, NotificationHandlerService.class));
+        startService(new Intent(this, InstanceIdService.class));
+
+        String refreshToken = FirebaseInstanceId.getInstance().getToken();
+     //   Log.d("refreshTokenLogin",refreshToken);
+
         RadioGroup radioGroupProfileOptions = (RadioGroup)findViewById(R.id.radiogroup_dashboard);
         radioGroupProfileOptions.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -52,37 +64,29 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        //FireBase All user link
 
-        allUserList = new ArrayList<>();
-
-        mRef = new Firebase("https://todocloudsavi.firebaseio.com/user");
         String email = mRef.getAuth().getProviderData().get("email").toString() ;
         setTitle(email.substring(0,email.indexOf('@')));
-        mFirebaseRefAllUser = new Firebase("https://todocloudsavi.firebaseio.com/alluser");
-        mFirebaseRefAllUser.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot != null && dataSnapshot.getValue()!= null){
-                    String data = dataSnapshot.getValue().toString() ;
-                    allUserList = new Gson().fromJson(data,new TypeToken<List<String>>(){}.getType());
-                    Toast.makeText(getBaseContext(), "User List Updated", Toast.LENGTH_SHORT).show();
-                    if (!allUserList.contains(uid)) {
-                        allUserList.add(uid);
-                        String userUpdate = new Gson().toJson(allUserList);
-                        mFirebaseRefAllUser.setValue(userUpdate);
-                        Toast.makeText(getBaseContext(), "User Added", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
 
-            }
-        });
 
+        onNewIntent(getIntent());
+
+
+    //    getAllUser();
+    }
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if(intent.getBooleanExtra(IntentConstant.INTENT_KEY_FRIEND_REQUEST,false)){
+            setFragment(FriendsFragment.newInstance());
+        }
     }
 
     private void dologout() {
+        AuthPreferences.getInstance().setLoginStatus(false);
         mRef.unauth();
         finish();
         Toast.makeText(getBaseContext(),"LogOut",Toast.LENGTH_SHORT).show();
@@ -98,7 +102,6 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
     }
 
 

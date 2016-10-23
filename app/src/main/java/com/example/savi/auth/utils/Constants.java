@@ -7,6 +7,8 @@ public class Constants {
     public final static int LIST_ITEMS  = 0 ;
     public final static int EDIT_TEXT  = LIST_ITEMS +  1  ;
     public final static int IMAGE_PICK  = 2 ;
+    public final static int IMAGE_CROP  = 3 ;
+
 
     public final static int SUCCESS_IMAGE_UPLOAD  = 5 ;
     public final static int FAIL_IMAGE_UPLOAD  = 1 ;

@@ -32,6 +32,7 @@ import com.example.savi.auth.adapter.ProfilePicSelectAdapter;
 import com.example.savi.auth.model.MessageItem;
 import com.example.savi.auth.model.User;
 import com.example.savi.auth.model.UserTest;
+import com.example.savi.auth.utils.AuthPreferences;
 import com.example.savi.auth.utils.CircleTransform;
 import com.example.savi.auth.utils.Constants;
 import com.example.savi.auth.utils.ImageCompressionAsyncTask;
@@ -41,6 +42,7 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -77,8 +79,8 @@ public class ProfileFragment extends Fragment {
     private FirebaseStorage mFirebaseStorage ;
     private StorageReference mStorageReference ;
 
-
     private List<UserTest> userTestList ;
+
     public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
         return fragment;
@@ -93,7 +95,6 @@ public class ProfileFragment extends Fragment {
         mTypedArray = getContext().getResources().obtainTypedArray(R.array.avatars);
 
         mFireBaseUserRef = new Firebase("https://todocloudsavi.firebaseio.com/user");
-
         mRef = new Firebase("https://todocloudsavi.firebaseio.com/");
         mRef.child("detaileduser_v1");
 
@@ -138,10 +139,8 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        uid = getActivity().getIntent().getStringExtra("uid");
-
+        uid = AuthPreferences.getInstance().getUserUid();
         userTestList = new ArrayList<>() ;
-        userTestList.clear();
 
         handler=new Handler() {
             @Override
@@ -154,9 +153,10 @@ public class ProfileFragment extends Fragment {
 
                         case Constants.SUCCESS_IMAGE_UPLOAD :
                                  syncData();
+                                 break;
 
                         case Constants.FAIL_IMAGE_UPLOAD :
-                            Toast.makeText(getActivity(),"Fail_upload",Toast.LENGTH_SHORT).show(); break;
+                                Toast.makeText(getActivity(),"Fail_upload",Toast.LENGTH_SHORT).show(); break;
 
                     }
             }
@@ -185,21 +185,6 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-
-       /* mRef.child("detaileduser").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapShot : dataSnapshot.getChildren()) {
-            UserTest userTest = postSnapShot.getValue(UserTest.class) ;
-                    //   userTestList.add(postSnapShot.getValue(UserTest.class));
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });*/
         return view;
     }
 
@@ -217,6 +202,8 @@ public class ProfileFragment extends Fragment {
         user.setPicPosition(image_position);
         user.setUid(uid);
         user.setProfileDownloadUri(imageUri);
+        user.setToken(FirebaseInstanceId.getInstance().getToken());
+        AuthPreferences.getInstance().setUserName(displayName);
 
         mRef.child("detaileduser_v1").child(uid).setValue(user, new Firebase.CompletionListener() {
             @Override
@@ -227,32 +214,6 @@ public class ProfileFragment extends Fragment {
 
         });
         mProgressbar.setVisibility(View.GONE);
-
-/*
-        final MessageItem messageme = new MessageItem();
-        messageme.setMessage("hi bechoo");
-        messageme.setSelf(false);
-        messageme.setStatus(5);
-        messageme.setSenderUid("gsgsgsddgg");
-        messageme.setTimeStamp(System.currentTimeMillis() + "");
-
-        mRef.child("detaileduser").child("gopalgogocom").child("messageItemList").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                long count = dataSnapshot.getChildrenCount();
-                mRef.child("detaileduser").child("gopalgogocom").child("messageItemList").child(count+"").setValue(messageme);
-                mRef.child("detaileduser").child("gopalgogocom").child("messageItemList").removeEventListener(this);
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
-
-      //  mRef.child("detaileduser").child("gopalgogocom").setValue(test);
-        //  mRef.child("detaileduser").child("gopalgogocom").child("messageList").push().setValue(new UserTest());
-*/
 
     }
 
@@ -295,14 +256,11 @@ public class ProfileFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-
                 mRef.child("detaileduser_v1").child(uid).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot != null && dataSnapshot.getValue() != null) {
-
-                            User user = dataSnapshot.getValue(User.class);
-
+                                User user = dataSnapshot.getValue(User.class);
                                 String displayName = user.getDisplayName() ;
                                 String status = user.getStatus() ;
                                 image_position = user.getPicPosition() ;
@@ -361,8 +319,7 @@ public class ProfileFragment extends Fragment {
     public void onActivityResult(final int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // When an Image is picked
-        if (resultCode == Activity.RESULT_OK && data != null && requestCode == Constants.IMAGE_PICK) {
-
+        if (resultCode == Activity.RESULT_OK && data != null) { if(requestCode == Constants.IMAGE_PICK) {
             Uri selectedImage = data.getData();
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
@@ -373,12 +330,34 @@ public class ProfileFragment extends Fragment {
 
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             final String image = cursor.getString(columnIndex);
-            imageSdPath = image ;
+            imageSdPath = image;
             cursor.close();
 
             File imageFile = new File(image);
             mImgaeViewProfile.setBackgroundResource(0);
+
+            Intent intent = new Intent("com.android.camera.action.CROP");
+            intent.setClassName("com.android.camera", "com.android.camera.CropImage");
+            Uri uri = Uri.fromFile(imageFile);
+            intent.setData(uri);
+            intent.putExtra("crop", "true");
+            intent.putExtra("aspectX", 1);
+            intent.putExtra("aspectY", 1);
+            intent.putExtra("outputX", 96);
+            intent.putExtra("outputY", 96);
+            intent.putExtra("noFaceDetection", true);
+            intent.putExtra("return-data", true);
+            startActivityForResult(intent, Constants.IMAGE_CROP);
             Picasso.with(getContext()).load(imageFile).transform(new CircleTransform(Color.WHITE, 5)).fit().into(mImgaeViewProfile);
+        }
+            else if(requestCode==Constants.IMAGE_CROP){
+            Bundle extras = data.getExtras();
+            if(extras != null ) {
+                Bitmap photo = extras.getParcelable("data");
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                photo.compress(Bitmap.CompressFormat.JPEG, 75, stream);
+            }
+            }
 
         }
 

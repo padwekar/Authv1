@@ -17,7 +17,10 @@ import android.widget.Toast;
 import com.example.savi.auth.R;
 import com.example.savi.auth.adapter.AllUserAdapter;
 import com.example.savi.auth.model.MessageItem;
+import com.example.savi.auth.model.NotificationRequest;
 import com.example.savi.auth.model.User;
+import com.example.savi.auth.operation.manager.SocialManager;
+import com.example.savi.auth.utils.AuthPreferences;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -40,7 +43,7 @@ public class AllUserFragment extends Fragment {
     }
 
     private AllUserAdapter mAllUserAdapter;
-    private Firebase mFireBaseRef , mFireBaseMsgCenter;
+    private Firebase mFireBaseRef, mFireBaseMsgCenter;
     private Map<String, User> mKeyUserMap;
     private User sender;
 
@@ -58,7 +61,9 @@ public class AllUserFragment extends Fragment {
         mFireBaseMsgCenter = mFireBaseRef.child(MESSAGE_CENTER);
         mAllUserAdapter = new AllUserAdapter(getContext(), false);
         mKeyUserMap = new LinkedHashMap<>();
-        uid = getActivity().getIntent().getStringExtra(UID);
+
+        uid = AuthPreferences.getInstance().getUserUid();
+
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_alluser);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(mAllUserAdapter);
@@ -73,7 +78,7 @@ public class AllUserFragment extends Fragment {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         User user = dataSnapshot.getValue(User.class);
 
-                        if(uid.equals(user.getUid()))
+                        if (uid.equals(user.getUid()))
                             return;
 
                         mKeyUserMap.put(user.getUid(), user);
@@ -85,7 +90,6 @@ public class AllUserFragment extends Fragment {
 
                     }
                 });
-
             }
 
             @Override
@@ -97,7 +101,7 @@ public class AllUserFragment extends Fragment {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         User user = dataSnapshot.getValue(User.class);
 
-                        if(uid.equals(user.getUid()))
+                        if (uid.equals(user.getUid()))
                             return;
 
                         mKeyUserMap.put(user.getUid(), user);
@@ -164,7 +168,7 @@ public class AllUserFragment extends Fragment {
                                         public void onClick(DialogInterface dialog, int which) {
                                             if (!mEditText.getText().toString().equals("")) {
                                                 Toast.makeText(getContext(), "Sending", Toast.LENGTH_SHORT).show();
-                                                sendMessageto(receiverInfo, mEditText.getText().toString(),false);
+                                                sendMessageto(receiverInfo, mEditText.getText().toString(), false);
                                                 dialog.dismiss();
                                             }
                                         }
@@ -177,6 +181,8 @@ public class AllUserFragment extends Fragment {
                                     });
                                     alert.create();
                                     alert.show();
+                                }if(which==1){
+                                    sendFriendRequest(receiverInfo);
                                 }
                             }
                         });
@@ -187,15 +193,35 @@ public class AllUserFragment extends Fragment {
         return view;
     }
 
+    private void sendFriendRequest(User receiverInfo) {
+        NotificationRequest request = new NotificationRequest();
+        request.data.put("body",AuthPreferences.getInstance().getUserName() + " wants to be your friend ! ");
+        request.data.put("for",receiverInfo.getUid());
+        request.to = receiverInfo.getToken();
+        SocialManager manager = new SocialManager();
+        manager.sendFriendRequest(request, new SocialManager.OnSendFriendRequest() {
+            @Override
+            public void OnSendFriendRequestSuccess(Object o) {
+                Toast.makeText(getContext(),"Success",Toast.LENGTH_SHORT).show();
+            }
 
-    private void sendMessageto(final User receiver, final String message , boolean isNew) {
+            @Override
+            public void OnSendFriendRequestFailure(Exception e) {
+                Toast.makeText(getContext(),"Failure",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
 
 
-        Firebase mRefUserTemp = mFireBaseMsgCenter.child(uid).child(receiver.getUid()).push() ;
-        String key = mRefUserTemp.getKey() ;
+    private void sendMessageto(final User receiver, final String message, boolean isNew) {
 
-        final String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "" ;
-        mFireBaseMsgCenter.child(receiver.getUid()).child(uid).push() .setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW, key, false), new Firebase.CompletionListener() {
+
+        Firebase mRefUserTemp = mFireBaseMsgCenter.child(uid).child(receiver.getUid()).push();
+        String key = mRefUserTemp.getKey();
+
+        final String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "";
+        mFireBaseMsgCenter.child(receiver.getUid()).child(uid).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.SENT, key, false), new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                 Toast.makeText(getContext(), "Message has been Sent", Toast.LENGTH_SHORT).show();
@@ -203,7 +229,7 @@ public class AllUserFragment extends Fragment {
             }
         });
 
-        mRefUserTemp.setValue(new MessageItem(uid, message, timeStamp, MessageItem.NEW,key, true), new Firebase.CompletionListener() {
+        mRefUserTemp.setValue(new MessageItem(uid, message, timeStamp, MessageItem.SENT, key, true), new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                 Toast.makeText(getContext(), "Message has been Delivered", Toast.LENGTH_SHORT).show();

@@ -20,6 +20,7 @@ import com.example.savi.auth.adapter.AllUserAdapter;
 import com.example.savi.auth.adapter.ChatAdapter;
 import com.example.savi.auth.model.MessageItem;
 import com.example.savi.auth.model.User;
+import com.example.savi.auth.utils.AuthPreferences;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -70,7 +71,9 @@ public class MessageFragment extends Fragment {
         mAllUserAdapter = new AllUserAdapter(getContext(),true);
         mFireBaseRef = new Firebase("https://todocloudsavi.firebaseio.com/");
         allUserMap = new HashMap<>();
-        final String uid = getActivity().getIntent().getStringExtra("uid");
+
+        final String uid = AuthPreferences.getInstance().getUserUid();
+
         mRecyclerViewMessageList = (RecyclerView)view.findViewById(R.id.recycler_view_messages);
         mRecyclerViewMessageList.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerViewMessageList.setAdapter(mAllUserAdapter);

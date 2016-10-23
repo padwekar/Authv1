@@ -1,12 +1,15 @@
 package com.example.savi.auth.adapter;
 
 import android.content.Context;
+import android.media.Image;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.savi.auth.R;
@@ -89,6 +92,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if(holder.getItemViewType()== MessageItem.SELF_MESSAGE){
             ChatSelfViewHolder selfViewHolder = (ChatSelfViewHolder)holder;
             selfViewHolder.textViewSelfMessage.setText(messageItemList.get(position).getMessage() + "  -"+ messageItemList.get(position).getStatus());
+            if(messageItemList.get(position).getStatus()==MessageItem.SENT){
+                selfViewHolder.imageViewStatus.setImageResource(R.drawable.ic_check_grey600_18dp);
+            }else if(messageItemList.get(position).getStatus()==MessageItem.DELIVERED){
+                selfViewHolder.imageViewStatus.setImageResource(R.drawable.ic_check_all_grey600_18dp);
+            }else{
+                selfViewHolder.imageViewStatus.setImageResource(0);
+            }
             long time = Long.parseLong(messageItemList.get(position).getTimeStamp()) ;
             String times = DateUtils.getFormattedString(time*1000, DateUtils.DATE_TIME_FORMAT_TYPE_HH_mm);
             String date = DateUtils.getFormattedString(time*1000, DateUtils.DATE_TIME_FORMAT_TYPE_dd_MM_yyyy);
@@ -111,12 +121,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public class ChatSelfViewHolder extends RecyclerView.ViewHolder{
-       public TextView textViewSelfMessage ;
-        public TextView textViewTime ;
+        private TextView textViewSelfMessage ;
+        private TextView textViewTime ;
+        private ImageView imageViewStatus ;
         public ChatSelfViewHolder(View itemView) {
             super(itemView);
             textViewSelfMessage = (TextView)itemView.findViewById(R.id.textview_msg);
             textViewTime = (TextView)itemView.findViewById(R.id.textview_msg_time);
+            imageViewStatus = (ImageView)itemView.findViewById(R.id.imageview_status);
         }
     }
 

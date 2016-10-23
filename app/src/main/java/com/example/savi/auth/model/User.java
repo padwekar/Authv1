@@ -14,9 +14,18 @@ public class User  {
     private String status ;
     private boolean isVisible ;
     private String email ;
+    private String token ;
     private int picPosition ;
     private LinkedHashMap<String,List<MessageItem>> messageMap ;
     private String profileDownloadUri ;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     public String getProfileDownloadUri() {
         return profileDownloadUri;
