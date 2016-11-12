@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.example.savi.auth.R;
-import com.example.savi.auth.activity.HomeActivity;
+import com.example.savi.auth.modules.dashboard.activity.HomeActivity;
 import com.example.savi.auth.constant.IntentConstant;
 import com.example.savi.auth.utils.AuthApplication;
 import com.example.savi.auth.utils.AuthPreferences;

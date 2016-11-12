@@ -6,7 +6,7 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
-import com.example.savi.auth.model.WebServiceRequest;
+import com.example.savi.auth.pojo.WebServiceRequest;
 import com.example.savi.auth.utils.AuthApplication;
 import com.example.savi.auth.utils.AuthException;
 import com.example.savi.auth.utils.AuthUtils;
