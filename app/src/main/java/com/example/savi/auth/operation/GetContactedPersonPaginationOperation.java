@@ -1,6 +1,6 @@
 package com.example.savi.auth.operation;
 
-import com.example.savi.auth.constant.ErrorConstants;
+import com.example.savi.auth.constant.OperationConstants;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -53,12 +53,12 @@ public class GetContactedPersonPaginationOperation {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(onGetContactedPersonOperation!=null){
-                    if(dataSnapshot==null || dataSnapshot.getChildren()==null){ onCancelled(new FirebaseError(-400, ErrorConstants.NO_DATA_FOUND)); return;}
+                    if(dataSnapshot==null || dataSnapshot.getChildren()==null){ onCancelled(new FirebaseError(-400, OperationConstants.NO_DATA_FOUND)); return;}
                     List<String> uidList = new ArrayList<>();
                     for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                         uidList.add(snapshot.getKey());
                     }
-                    if(uidList.size()==0)onCancelled(new FirebaseError(-400,ErrorConstants.NO_DATA_FOUND));
+                    if(uidList.size()==0)onCancelled(new FirebaseError(-400, OperationConstants.NO_DATA_FOUND));
                   //  onGetContactedPersonOperation.onGetContactedPersonOperationSuccess(uidList);
                 }
             }

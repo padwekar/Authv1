@@ -19,6 +19,7 @@ import com.example.savi.auth.utils.CircleTransform;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
     private OnUserItemClickListener IOnItemClickListener;
     private OnFriendShipStatusClickListener mOnFriendShipStatusClickListener;
     private OnInstantMessageClickListener mOnInstantMessageClickListener;
+    private HashMap<String, Integer> mCircleMap;
 
 
     public interface OnUserItemClickListener {
@@ -69,6 +71,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
         mTypedArray = mContext.getResources().obtainTypedArray(R.array.avatars);
         this.isInboxList = isInboxList;
         userMessageItemLinkedHashMap = new LinkedHashMap<>();
+        mCircleMap = new HashMap<>();
     }
 
 
@@ -77,9 +80,8 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
         String uid = user.getUid();
         if (mKeyUserMap.containsKey(uid)) {
             int keyposition = mUserList.indexOf(mKeyUserMap.get(uid));
-            User userItem = mKeyUserMap.get(uid);
             mKeyUserMap.remove(uid);
-            mUserList.remove(userItem);
+            mUserList.remove(keyposition);
             notifyItemRemoved(keyposition);
         }
 
@@ -104,6 +106,11 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
         notifyItemInserted(0);
     }
 
+    public void setCircleMap(HashMap<String, Integer> circleMap) {
+        mCircleMap.clear();
+        mCircleMap = circleMap;
+        notifyDataSetChanged();
+    }
 
     @Override
     public AllUserAdapter.AllUserViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
@@ -127,26 +134,21 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
 
             holder.mImageViewFriendshipStatus.setImageResource(R.drawable.ic_add_friend);
             user.setFriendShipStatus(User.NOT_FRIENDS);
-            if (user.getContactedPersonsMap() != null) {
-                forLoop:
-                for (Map.Entry<String, Integer> entry : user.getContactedPersonsMap().entrySet()) {
-                    if (userUid.equals(entry.getKey())) {
-                        switch (entry.getValue()) {
-                            case User.REQUEST_SENT:
-                                holder.mImageViewFriendshipStatus.setImageResource(R.drawable.ic_request_sent);
-                                user.setFriendShipStatus(User.REQUEST_SENT);
-                                break forLoop;
-                            case User.FRIENDS:
-                                holder.mImageViewFriendshipStatus.setImageResource(R.drawable.ic_friends);
-                                user.setFriendShipStatus(User.FRIENDS);
-                                break forLoop;
-                            case User.FRIEND_REQUEST:
-                                holder.mImageViewFriendshipStatus.setImageResource(R.drawable.ic_request_pending);
-                                user.setFriendShipStatus(User.FRIEND_REQUEST);
-                                break forLoop;
-                        }
-                    }
-                }
+
+            if(mCircleMap.get(user.getUid())!=null)
+            switch (mCircleMap.get(user.getUid())) {
+                case User.REQUEST_SENT:
+                    holder.mImageViewFriendshipStatus.setImageResource(R.drawable.ic_request_sent);
+                    user.setFriendShipStatus(User.REQUEST_SENT);
+                    break;
+                case User.FRIENDS:
+                    holder.mImageViewFriendshipStatus.setImageResource(R.drawable.ic_friends);
+                    user.setFriendShipStatus(User.FRIENDS);
+                    break;
+                case User.FRIEND_REQUEST:
+                    holder.mImageViewFriendshipStatus.setImageResource(R.drawable.ic_request_pending);
+                    user.setFriendShipStatus(User.FRIEND_REQUEST);
+                    break;
             }
 
             holder.mTextviewName.setText(mUserList.get(position).getDisplayName());

@@ -1,7 +1,7 @@
 package com.example.savi.auth.operation;
 
 import com.example.savi.auth.constant.Constants;
-import com.example.savi.auth.constant.ErrorConstants;
+import com.example.savi.auth.constant.OperationConstants;
 import com.example.savi.auth.pojo.User;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -26,7 +26,7 @@ public class GetUserOperation {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user ;
                 if(onGetUserOperationListener!=null){
-                    if(dataSnapshot==null || (user =dataSnapshot.getValue(User.class))==null){onCancelled(new FirebaseError(-400 , ErrorConstants.USER_NOT_FOUND));return;}
+                    if(dataSnapshot==null || (user =dataSnapshot.getValue(User.class))==null){onCancelled(new FirebaseError(-400 , OperationConstants.USER_NOT_FOUND));return;}
                     onGetUserOperationListener.OnGetUserOperationSuccess(user);
                 }
             }
@@ -47,7 +47,7 @@ public class GetUserOperation {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user ;
                 if(onGetUserOperationListener!=null){
-                    if(dataSnapshot==null || (user =dataSnapshot.getValue(User.class))==null){onCancelled(new FirebaseError(-400 , ErrorConstants.USER_NOT_FOUND));return;}
+                    if(dataSnapshot==null || (user =dataSnapshot.getValue(User.class))==null){onCancelled(new FirebaseError(-400 , OperationConstants.USER_NOT_FOUND));return;}
                     onGetUserOperationListener.OnGetUserOperationSuccess(user);
                 }
             }

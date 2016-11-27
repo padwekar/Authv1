@@ -3,15 +3,11 @@ package com.example.savi.auth.pojo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-/**
- * Created by Savi on 09-07-2016.
- */
-
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MessageItem {
 
+public class MessageItem {
 
     public final static int SELF_MESSAGE = 0 ;
     public final static int RESPONSE_MESSAGE = 1 ;

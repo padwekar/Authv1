@@ -1,8 +1,6 @@
 package com.example.savi.auth.constant;
 
-/**
- * Created by Savi on 09-07-2016.
- */
+
 public class Constants {
     public final static int LIST_ITEMS  = 0 ;
     public final static int EDIT_TEXT  = LIST_ITEMS +  1  ;
@@ -19,6 +17,7 @@ public class Constants {
     public final static String MESSAGE_CENTER = "message_center" ;
     public final static String USER_DETAIL = "detaileduser_v1";
     public final static String CONTACTED_PERSON_MAP ="contactedPersonsMap";
+    public final static String CIRCLE ="circle";
     public final static String UID = "uid";
 
     //Listener Type

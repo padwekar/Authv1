@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import com.example.savi.auth.R;
 import com.example.savi.auth.modules.alluser.adapter.AllUserAdapter;
+import com.example.savi.auth.modules.alluser.operation.manager.UserManager;
+import com.example.savi.auth.modules.message.operation.manager.MessageManager;
 import com.example.savi.auth.pojo.FriendShipStatus;
 import com.example.savi.auth.pojo.MessageItem;
 import com.example.savi.auth.pojo.NotificationRequest;
@@ -29,6 +31,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -65,109 +68,20 @@ public class AllUserFragment extends Fragment {
 
         uid = AuthPreferences.getInstance().getUserUid();
 
+        //Request Send Listener
         mAllUserAdapter.setOnFriendShipStatusClickListener(new AllUserAdapter.OnFriendShipStatusClickListener() {
             @Override
             public void onFriedShipStatusClick(final User user) {
-                switch (user.getFriendShipStatus()){
-                case  FriendShipStatus.NOT_FRIENDS :
-
-            mFireBaseRef.child(Constants.USER_DETAIL).child(uid).child("contactedPersonsMap").child(user.getUid()).setValue(User.REQUEST_SENT, new Firebase.CompletionListener() {
-                @Override
-                public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                    String message = "Successful" ;
-                    if(firebaseError!=null)
-                        message = firebaseError.getMessage() ;
-
-                    Toast.makeText(getContext(),message,Toast.LENGTH_SHORT).show() ; return;
-
-                }
-            });
-            mFireBaseRef.child(Constants.USER_DETAIL).child(user.getUid()).child("contactedPersonsMap").child(uid).setValue(User.FRIEND_REQUEST);
-
-
-                }
+                sendFriendRequest(user);
             }
         });
 
+        getCircleMap(uid);
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_alluser);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(mAllUserAdapter);
-
-        mFireBaseRef.child(USER_DETAIL).orderByPriority().addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mProgressBar.setVisibility(View.GONE);
-                final String key = dataSnapshot.getKey();
-                mFireBaseRef.child(USER_DETAIL).child(key).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        User user = dataSnapshot.getValue(User.class);
-
-                        if (uid.equals(user.getUid()))
-                            return;
-
-                        mKeyUserMap.put(user.getUid(), user);
-                        mAllUserAdapter.addUser(user);
-                    }
-
-                    @Override
-                    public void onCancelled(FirebaseError firebaseError) {
-
-                    }
-                });
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                final String key = dataSnapshot.getKey();
-
-                mFireBaseRef.child(USER_DETAIL).child(key).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        User user = dataSnapshot.getValue(User.class);
-
-                        if (uid.equals(user.getUid()))
-                            return;
-
-                        mKeyUserMap.put(user.getUid(), user);
-                        mAllUserAdapter.addUser(user);
-                    }
-
-                    @Override
-                    public void onCancelled(FirebaseError firebaseError) {
-
-                    }
-                });
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                final String key = dataSnapshot.getKey();
-                mFireBaseRef.child(USER_DETAIL).child(key).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        User user = dataSnapshot.getValue(User.class);
-                    }
-
-                    @Override
-                    public void onCancelled(FirebaseError firebaseError) {
-
-                    }
-                });
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-
-        });
+        getAllUser();
 
         mAllUserAdapter.setUserItemClickListener(new AllUserAdapter.OnUserItemClickListener() {
             @Override
@@ -194,7 +108,7 @@ public class AllUserFragment extends Fragment {
                                         public void onClick(DialogInterface dialog, int which) {
                                             if (!mEditText.getText().toString().equals("")) {
                                                 Toast.makeText(getContext(), "Sending", Toast.LENGTH_SHORT).show();
-                                                sendMessageto(receiverInfo, mEditText.getText().toString(), false);
+                                                new MessageManager().sendMessage(receiverInfo.getUid(), mEditText.getText().toString());
                                                 dialog.dismiss();
                                             }
                                         }
@@ -219,7 +133,68 @@ public class AllUserFragment extends Fragment {
         return view;
     }
 
+    private void getAllUser() {
+        new UserManager().getAllUsers(new UserManager.OnGetAllUserManager() {
+            @Override
+            public void onUserAdded(User user, String key) {
+                if(mProgressBar.getVisibility()!=View.GONE) mProgressBar.setVisibility(View.GONE);
+                addToList(user,key);
+            }
+
+            @Override
+            public void onUserUpdated(User user, String key) {
+                addToList(user,key);
+            }
+
+            @Override
+            public void onUserRemoved(User user) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError error) {
+
+            }
+        });
+    }
+
+    private void addToList(User user, String key) {
+        if (uid.equals(key))
+            return;
+
+        mKeyUserMap.put(key, user);
+        mAllUserAdapter.addUser(user);
+    }
+
+    private void getCircleMap(String uid) {
+        SocialManager manager = new SocialManager();
+        manager.getUserCircleMap(uid, new SocialManager.OnGetUserCircleMap() {
+            @Override
+            public void onGetUserCircleMapSuccess(HashMap<String, Integer> circleMap) {
+                if(isAdded()) mAllUserAdapter.setCircleMap(circleMap);
+            }
+
+            @Override
+            public void onGetUserCircleMapFailure(FirebaseError error) {
+                if(isAdded()) Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void sendFriendRequest(User receiverInfo) {
+
+        mFireBaseRef.child(Constants.CIRCLE).child(uid).child(receiverInfo.getUid()).setValue(User.REQUEST_SENT, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+
+                String message = "Successful" ;
+                if(firebaseError!=null)
+                    message = firebaseError.getMessage() ;
+
+            }
+        });
+        mFireBaseRef.child(Constants.CIRCLE).child(receiverInfo.getUid()).child(uid).setValue(User.FRIEND_REQUEST);
+
         NotificationRequest request = new NotificationRequest();
         request.data.put("body",AuthPreferences.getInstance().getUserName() + " wants to be your friend ! ");
         request.data.put("for",receiverInfo.getUid());
@@ -228,39 +203,15 @@ public class AllUserFragment extends Fragment {
         manager.sendFriendRequest(request, new SocialManager.OnSendFriendRequest() {
             @Override
             public void onSendFriendRequestSuccess(Object o) {
-                Toast.makeText(getContext(),"Success",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),"Notification Sent",Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onSendFriendRequestFailure(Exception e) {
-                Toast.makeText(getContext(),"Failure",Toast.LENGTH_SHORT).show();
-            }
-        });
-
-    }
-
-
-    private void sendMessageto(final User receiver, final String message, boolean isNew) {
-
-
-        Firebase mRefUserTemp = mFireBaseMsgCenter.child(uid).child(receiver.getUid()).push();
-        String key = mRefUserTemp.getKey();
-
-        final String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "";
-        mFireBaseMsgCenter.child(receiver.getUid()).child(uid).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.SENT, key, false), new Firebase.CompletionListener() {
-            @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                Toast.makeText(getContext(), "Message has been Sent", Toast.LENGTH_SHORT).show();
-                mFireBaseRef.child(MESSAGE_CENTER).child(receiver.getUid()).child(uid).setPriority(timeStamp);
-            }
-        });
-
-        mRefUserTemp.setValue(new MessageItem(uid, message, timeStamp, MessageItem.SENT, key, true), new Firebase.CompletionListener() {
-            @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                Toast.makeText(getContext(), "Message has been Delivered", Toast.LENGTH_SHORT).show();
-                mFireBaseRef.child(MESSAGE_CENTER).child(uid).child(receiver.getUid()).setPriority(timeStamp);
+                Toast.makeText(getContext(),"Notification Error",Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+
 }

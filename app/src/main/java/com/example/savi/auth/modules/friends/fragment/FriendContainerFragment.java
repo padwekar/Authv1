@@ -23,19 +23,18 @@ public class FriendContainerFragment extends Fragment {
         return fragment;
     }
 
-    private ViewPager viewPager ;
-    private FriendViewPagerAdapter viewPagerAdapter ;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friends, container, false);
-        Toast.makeText(getContext(), "In Friends Fragment", Toast.LENGTH_SHORT).show();
 
-        Fragment[] fragments = {FriendRequestFragment.newInstance(),FriendsFragment.newInstance(),SentFriendRequestFragment.newInstance()} ;
-        List<Fragment> fragmentList = Arrays.asList(fragments) ;
-        viewPager = (ViewPager)view.findViewById(R.id.viewpager_friends);
-        viewPagerAdapter = new FriendViewPagerAdapter(getActivity().getSupportFragmentManager(),getContext());
+        Fragment[] fragments = {FriendRequestFragment.newInstance(), FriendsFragment.newInstance(), SentFriendRequestFragment.newInstance()};
+        List<Fragment> fragmentList = Arrays.asList(fragments);
+
+        ViewPager viewPager = (ViewPager) view.findViewById(R.id.viewpager_friends);
+        FriendViewPagerAdapter viewPagerAdapter = new FriendViewPagerAdapter(getActivity().getSupportFragmentManager(), getContext());
+
         viewPagerAdapter.setFragmentList(fragmentList);
         viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(viewPagerAdapter);

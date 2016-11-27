@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.savi.auth.R;
 import com.example.savi.auth.modules.message.adapter.ChatAdapter;
+import com.example.savi.auth.modules.message.operation.manager.MessageManager;
 import com.example.savi.auth.pojo.MessageItem;
 import com.example.savi.auth.pojo.User;
 import com.example.savi.auth.utils.AuthPreferences;
@@ -81,7 +82,7 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 String message = mEditTextMessageInput.getText().toString();
                 if (!message.equals("")) {
-                    sendMessageto(receiver, message, true);
+                    new MessageManager().sendMessage(receiver.getUid(), message);
                     mEditTextMessageInput.setText("");
                 }
 
@@ -91,8 +92,8 @@ public class ChatFragment extends Fragment {
         messageItemList = new ArrayList<>();
         progressBar = (ProgressBar)view.findViewById(R.id.progressbar);
 
-        TextView mTextviewReceiver = (TextView) view.findViewById(R.id.textview_receiver);
-        mTextviewReceiver.setText(receiver.getDisplayName());
+        TextView mTextViewReceiver = (TextView) view.findViewById(R.id.textview_receiver);
+        mTextViewReceiver.setText(receiver.getDisplayName());
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mLayoutManager.setStackFromEnd(true);
@@ -261,88 +262,36 @@ public class ChatFragment extends Fragment {
             imageViewDownArrow.setVisibility(View.GONE);
         }
     }
-
+// S-uid R-uid limitToLast 20 Value Event Listener // Will Listen to all the Latest Messages
 
     private void addChildEventListener() {
-        mRefUser.child(uid).child(receiver.getUid()).limitToLast(20).addChildEventListener(new ChildEventListener() {
+        new MessageManager().getMessages(receiver.getUid(), 20, new MessageManager.OnUpdateMessage() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.i("ChildAdded", "inside");
-                if (dataSnapshot != null) {
-                    if (firstElementKey == null) {
-                        firstElementKey = dataSnapshot.getKey();
-                        Log.i("firstElementKey", firstElementKey);
-                    }
+            public void onMessageAdded(MessageItem messageItem, String key) {
+                if (firstElementKey == null) firstElementKey = key ;
 
-                    final MessageItem messageItem = dataSnapshot.getValue(MessageItem.class);
-                    if (!messageItemList.contains(messageItem)) {
-                        messageItemList.add(messageItem);
-                        chatAdapter.addMessage(messageItem);
-                        int count = chatAdapter.getItemCount() - 1;
+                chatAdapter.addMessage(messageItem);
+                int count = chatAdapter.getItemCount() - 1;
 
-                        if (!messageItem.getSelf()) {
-                            if (messageItem.getStatus() != MessageItem.DELIVERED) {
-                                messageItem.setStatus(MessageItem.DELIVERED);
-                                mRefUser.child(receiver.getUid()).child(uid).child(messageItem.getSenderBranchKey()).child("status").setValue(MessageItem.DELIVERED, new Firebase.CompletionListener() {
-                                    @Override
-                                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                                        Log.i(messageItem.getMessage(), "Delivered with " + firebaseError + ": Error");
-                                    }
-                                });
-                            }
-
-                            if (scrollToBottom)
-                                recyclerViewMessages.scrollToPosition(count);
-                        } else {
-                            recyclerViewMessages.scrollToPosition(count);
-                        }
-                    }
+                if (!messageItem.getSelf()&& messageItem.getStatus() != MessageItem.DELIVERED) {
+                        messageItem.setStatus(MessageItem.DELIVERED);
+                        mRefUser.child(receiver.getUid()).child(uid).child(messageItem.getSenderBranchKey()).child("status").setValue(MessageItem.DELIVERED);
+                        if (scrollToBottom) recyclerViewMessages.scrollToPosition(count);
+                } else {
+                       recyclerViewMessages.scrollToPosition(count);
                 }
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                MessageItem messageItem = dataSnapshot.getValue(MessageItem.class);
+            public void onMessageUpdated(MessageItem messageItem, String key) {
                 chatAdapter.updateMessage(messageItem);
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onMessageDeleted(MessageItem messageItem) {
 
             }
         });
     }
 
-
-    private void sendMessageto(final User receiver, final String message, boolean isNew) {
-
-        Firebase mRefUserTemp = mRefUser.child(uid).child(receiver.getUid()).push();
-        String key = mRefUserTemp.getKey();
-
-        final String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + "";
-        mRefUser.child(receiver.getUid()).child(uid).push().setValue(new MessageItem(uid, message, timeStamp, MessageItem.SENT, key, false), new Firebase.CompletionListener() {
-            @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                mFireBaseRef.child(MESSAGE_CENTER).child(receiver.getUid()).child(uid).setPriority(timeStamp);
-            }
-        });
-
-        mRefUserTemp.setValue(new MessageItem(uid, message, timeStamp, MessageItem.SENT, key, true), new Firebase.CompletionListener() {
-            @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                mFireBaseRef.child(MESSAGE_CENTER).child(uid).child(receiver.getUid()).setPriority(timeStamp);
-            }
-        });
-    }
 }

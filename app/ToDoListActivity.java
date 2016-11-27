@@ -73,7 +73,6 @@ public class ToDoListActivity extends AppCompatActivity {
         if(mSpannableStringGreetUser!=null)
             mTextViewGreets.setText(mSpannableStringGreetUser);
 
-
         mEditTextAddTask = (EditText)findViewById(R.id.edittext_add_task);
         mTodoAdapter = new TodoAdapter();
         try {

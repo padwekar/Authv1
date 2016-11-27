@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by Savi on 23-07-2016.
- */
 public class UserTest {
 
     private String uid ;

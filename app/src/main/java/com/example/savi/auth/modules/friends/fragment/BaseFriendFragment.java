@@ -12,14 +12,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
-import com.example.savi.auth.constant.Constants;
 import com.example.savi.auth.modules.friends.adapter.FriendAdapter;
 import com.example.savi.auth.operation.manager.SocialManager;
 import com.example.savi.auth.pojo.User;
+import com.example.savi.auth.utils.AuthPreferences;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.savi.auth.constant.Constants.TODOCLOUD_ROOT_FIREBASE_URL;
@@ -27,13 +26,15 @@ import static com.example.savi.auth.constant.Constants.TODOCLOUD_ROOT_FIREBASE_U
 public abstract class BaseFriendFragment extends Fragment{
 
     private FriendAdapter mFriendAdapter ;
-    private Firebase mFireBaseRef ;
-    private List<User> mPersonList = new ArrayList<>();
+    protected Firebase mFireBaseRef ;
+    protected String userUid = AuthPreferences.getInstance().getUserUid();
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_base_friend,container,false);
+
         TextView textViewHeader = (TextView)view.findViewById(R.id.textview_header);
         textViewHeader.setText(getHeader());
 
@@ -57,11 +58,10 @@ public abstract class BaseFriendFragment extends Fragment{
 
     protected void getPersonList(String uid,int status,int limit){
         SocialManager manager = new SocialManager();
-        manager.getContactedPerson(uid, Constants.CONTACTED_PERSON_MAP, status, limit, new SocialManager.OnGetContactedPersons() {
+        manager.getContactedPerson(uid, status, limit, new SocialManager.OnGetContactedPersons() {
             @Override
             public void onGetContactedPersonsSuccess(List<User> userList) {
                 if(isAdded()){
-                    mPersonList = userList ;
                     mFriendAdapter.setData(userList);
                     Toast.makeText(getContext(),"Success",Toast.LENGTH_SHORT).show();
                 }
@@ -75,5 +75,6 @@ public abstract class BaseFriendFragment extends Fragment{
             }
         });
     }
+
     abstract String getHeader();
 }

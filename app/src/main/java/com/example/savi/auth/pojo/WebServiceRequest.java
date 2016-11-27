@@ -15,10 +15,6 @@ import com.google.gson.Gson;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
-/**
- * Created by Savi on 23-10-2016.
- */
-
 public class WebServiceRequest extends Request {
 
     private final Gson gson = new Gson();
@@ -38,6 +34,7 @@ public class WebServiceRequest extends Request {
      * @param responseListener
      * @param errorListener
      */
+
     public WebServiceRequest(String url, int method, Map<String, String> headers,
                              String body, Response.Listener responseListener, Response.ErrorListener errorListener) {
         super(method, url, errorListener);

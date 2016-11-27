@@ -39,6 +39,7 @@ public class NotificationHandlerService extends FirebaseMessagingService {
         builder.setContentText(remoteMessage.getData().get("body"));
         builder.setSmallIcon(R.drawable.logo_lifesavi);
         builder.setContentIntent(pendingIntent);
+        builder.setAutoCancel(true);
 
         NotificationManager manager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(remoteMessage.hashCode(),builder.build());

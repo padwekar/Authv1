@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
+import com.example.savi.auth.constant.Constants;
 import com.example.savi.auth.modules.friends.adapter.FriendAdapter;
 import com.example.savi.auth.pojo.User;
 
@@ -31,8 +32,8 @@ public class SentFriendRequestFragment extends BaseFriendFragment{
             @Override
             public void onActionClick(User user, int action) {
                 if(action==User.ACTION_CANCEL_REQUEST){
-                    Toast.makeText(getContext(),"cancel sent request",Toast.LENGTH_SHORT).show();
-                }
+                    mFireBaseRef.child(Constants.CIRCLE).child(userUid).child(user.getUid()).removeValue();
+                    mFireBaseRef.child(Constants.CIRCLE).child(user.getUid()).child(userUid).removeValue();                }
             }
         });
         return friendAdapter;

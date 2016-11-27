@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
+import com.example.savi.auth.constant.Constants;
 import com.example.savi.auth.modules.friends.adapter.FriendAdapter;
 import com.example.savi.auth.pojo.User;
 
@@ -32,8 +33,8 @@ public class FriendsFragment extends BaseFriendFragment{
             @Override
             public void onActionClick(User user, int action) {
                 if(action==User.ACTION_UNFRIEND){
-                    Toast.makeText(getContext(),"unfriend",Toast.LENGTH_SHORT).show();
-                }
+                    mFireBaseRef.child(Constants.CIRCLE).child(userUid).child(user.getUid()).removeValue();
+                    mFireBaseRef.child(Constants.CIRCLE).child(user.getUid()).child(userUid).removeValue();                }
             }
         });
         return friendAdapter;
