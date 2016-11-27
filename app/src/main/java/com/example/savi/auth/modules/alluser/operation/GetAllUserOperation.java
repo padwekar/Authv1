@@ -11,8 +11,8 @@ import com.firebase.client.FirebaseError;
 public class GetAllUserOperation extends BaseOperation {
 
     public interface OnGetAllUserListener{
-        void onUserAdded(User user,String key);
-        void onUserUpdated(User user,String key);
+        void onUserAdded(User user);
+        void onUserUpdated(User user);
         void onUserRemoved(User user);
         void onCancelled(FirebaseError error);
     }
@@ -23,13 +23,13 @@ public class GetAllUserOperation extends BaseOperation {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String key) {
              if(isEmpty(dataSnapshot)||listener==null)return;
-                listener.onUserAdded(dataSnapshot.getValue(User.class),key);
+                listener.onUserAdded(dataSnapshot.getValue(User.class));
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String key) {
                 if(isEmpty(dataSnapshot)||listener==null)return;
-                listener.onUserUpdated(dataSnapshot.getValue(User.class),key);
+                listener.onUserUpdated(dataSnapshot.getValue(User.class));
             }
 
             @Override

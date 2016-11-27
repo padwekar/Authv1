@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
+import com.example.savi.auth.modules.dashboard.activity.HomeActivity;
 import com.example.savi.auth.modules.message.adapter.ChatAdapter;
 import com.example.savi.auth.modules.message.operation.manager.MessageManager;
 import com.example.savi.auth.pojo.MessageItem;
@@ -71,6 +72,7 @@ public class ChatFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_detailed_chat, container, false);
         uid = AuthPreferences.getInstance().getUserUid();
+
 
         mRefUser = new Firebase(Constants.TODOCLOUD_ROOT_FIREBASE_URL + Constants.MESSAGE_CENTER);
         mFireBaseRef = new Firebase(TODOCLOUD_ROOT_FIREBASE_URL);

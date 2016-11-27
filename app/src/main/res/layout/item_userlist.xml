@@ -43,13 +43,13 @@
 
         <ImageView
             android:id="@+id/imageview_message"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_alignParentEnd="true"
             android:layout_below="@id/textview_display_name"
             android:layout_marginStart="5dp"
             android:contentDescription="@null"
-            android:src="@android:drawable/alert_dark_frame" />
+            android:src="@drawable/ic_instant_message" />
 
 
         <TextView

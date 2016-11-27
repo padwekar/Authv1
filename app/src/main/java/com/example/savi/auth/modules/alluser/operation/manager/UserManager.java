@@ -7,8 +7,8 @@ import com.firebase.client.FirebaseError;
 public class UserManager {
 
     public interface OnGetAllUserManager{
-        void onUserAdded(User user, String key);
-        void onUserUpdated(User user,String key);
+        void onUserAdded(User user);
+        void onUserUpdated(User user);
         void onUserRemoved(User user);
         void onCancelled(FirebaseError error);
     }
@@ -16,13 +16,13 @@ public class UserManager {
     public void getAllUsers(final OnGetAllUserManager listener){
         new GetAllUserOperation(new GetAllUserOperation.OnGetAllUserListener() {
             @Override
-            public void onUserAdded(User user, String key) {
-                if(listener!=null)listener.onUserAdded(user,key);
+            public void onUserAdded(User user) {
+                if(listener!=null)listener.onUserAdded(user);
             }
 
             @Override
-            public void onUserUpdated(User user, String key) {
-                if(listener!=null)listener.onUserUpdated(user,key);
+            public void onUserUpdated(User user) {
+                if(listener!=null)listener.onUserUpdated(user);
             }
 
             @Override

@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.savi.auth.R;
 import com.example.savi.auth.modules.alluser.adapter.AllUserAdapter;
+import com.example.savi.auth.modules.message.adapter.InboxAdapter;
 import com.example.savi.auth.pojo.MessageItem;
 import com.example.savi.auth.pojo.User;
 import com.example.savi.auth.utils.AuthPreferences;
@@ -37,7 +38,7 @@ public class MessageFragment extends Fragment {
 
 
     private User sender ;
-    private AllUserAdapter mAllUserAdapter  ;
+    private InboxAdapter mInboxAdapter  ;
     private Firebase mFireBaseRef ;
     private RecyclerView mRecyclerViewMessageList ;
 
@@ -53,14 +54,14 @@ public class MessageFragment extends Fragment {
         Toast.makeText(getContext(),"In MessageFragment",Toast.LENGTH_SHORT).show();
         Firebase.setAndroidContext(getContext());
         userHashMap = new HashMap<>();
-        mAllUserAdapter = new AllUserAdapter(getContext(),true);
+        mInboxAdapter = new InboxAdapter(getContext());
         mFireBaseRef = new Firebase("https://todocloudsavi.firebaseio.com/");
 
         final String uid = AuthPreferences.getInstance().getUserUid();
 
         mRecyclerViewMessageList = (RecyclerView)view.findViewById(R.id.recycler_view_messages);
         mRecyclerViewMessageList.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerViewMessageList.setAdapter(mAllUserAdapter);
+        mRecyclerViewMessageList.setAdapter(mInboxAdapter);
 
         final LinkedHashMap<User,MessageItem> itemLinkedHashMap = new LinkedHashMap<>();
         final Firebase mFireBaseRefnew = mFireBaseRef.child("message_center").child(uid) ;
@@ -93,14 +94,14 @@ public class MessageFragment extends Fragment {
                         for (DataSnapshot post : dataSnapshot.getChildren()) {
                             final MessageItem item = post.getValue(MessageItem.class);
                             if (userHashMap.containsKey(dataSnapshot.getKey())) {
-                                mAllUserAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
+                                mInboxAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
                             } else {
                                 mFireBaseRef.child("detaileduser_v1").child(dataSnapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         User user = dataSnapshot.getValue(User.class);
                                         userHashMap.put(dataSnapshot.getKey(), user);
-                                        mAllUserAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
+                                        mInboxAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
                                     }
 
                                     @Override
@@ -133,7 +134,7 @@ public class MessageFragment extends Fragment {
                         for (DataSnapshot post : dataSnapshot.getChildren()) {
                             final MessageItem item = post.getValue(MessageItem.class);
                             if (userHashMap.containsKey(dataSnapshot.getKey())) {
-                                mAllUserAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
+                                mInboxAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
                                 break;
                             } else {
                                 mFireBaseRef.child("detaileduser_v1").child(dataSnapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -141,7 +142,7 @@ public class MessageFragment extends Fragment {
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         User user = dataSnapshot.getValue(User.class);
                                         userHashMap.put(dataSnapshot.getKey(), user);
-                                        mAllUserAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
+                                        mInboxAdapter.addTotheMap(userHashMap.get(dataSnapshot.getKey()), item);
                                     }
 
                                     @Override
@@ -196,8 +197,8 @@ public class MessageFragment extends Fragment {
                         allUserMap.put(user.getUid(),user);
 
                     }
-                    mAllUserAdapter.addUserList(mUserList);
-                    mAllUserAdapter.addKeyUserMapp(allUserMap);
+                    mInboxAdapter.addUserList(mUserList);
+                    mInboxAdapter.addKeyUserMapp(allUserMap);
                 }
 
             }
@@ -207,7 +208,7 @@ public class MessageFragment extends Fragment {
 
             }
         });*/
-        mAllUserAdapter.setUserItemClickListener(new AllUserAdapter.OnUserItemClickListener() {
+        mInboxAdapter.setUserItemClickListener(new InboxAdapter.OnUserItemClickListener() {
             @Override
             public void onItemClick(String receiverUID) {
                 setFragment(ChatFragment.newInstance(userHashMap.get(receiverUID)));

@@ -28,18 +28,6 @@ public class User  {
 
     public final static String[] friendshipActions = {"SEND FRIEND REQUEST" , "CANCEL FRIEND REQUEST" , "UNFRIEND" , "ACCEPT/REJECT"} ;
 
-    public Map<String, Integer> getContactedPersonsMap() {
-        return contactedPersonsMap!=null ? contactedPersonsMap  : new HashMap<String, Integer>() ;
-    }
-
-    public void setContactedPersonsMap(Map<String, Integer> contactedPersonsMap) {
-        this.contactedPersonsMap = contactedPersonsMap;
-    }
-
-    public void updateContactedPerson(String uid , int friendShipStatus){
-        contactedPersonsMap= contactedPersonsMap!=null ? contactedPersonsMap  : new HashMap<String, Integer>() ;
-        contactedPersonsMap.put(uid,friendShipStatus);
-    }
 
     private String uid ;
     private String displayName ;
@@ -123,5 +111,10 @@ public class User  {
 
     public void setFriendShipStatus(int friendShipStatus) {
         this.friendShipStatus = friendShipStatus;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return ((User)obj).getUid().equals(uid) ;
     }
 }

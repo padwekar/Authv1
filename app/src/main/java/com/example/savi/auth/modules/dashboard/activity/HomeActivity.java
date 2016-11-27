@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
+import com.example.savi.auth.base.BaseActivity;
 import com.example.savi.auth.constant.IntentConstant;
 import com.example.savi.auth.modules.alluser.fragment.AllUserFragment;
 import com.example.savi.auth.modules.friends.fragment.FriendContainerFragment;
@@ -25,13 +26,15 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends BaseActivity {
 
     private TextView textViewLogOut ;
 
-    private Firebase mRef, mFirebaseRefAllUser;
+    private Firebase mRef;
     private List<String> allUserList = new ArrayList<>();;
     private String uid ;
+
+    private RadioGroup mRadioGroupProfileOptions ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +52,8 @@ public class HomeActivity extends AppCompatActivity {
         String refreshToken = FirebaseInstanceId.getInstance().getToken();
      //   Log.d("refreshTokenLogin",refreshToken);
 
-        RadioGroup radioGroupProfileOptions = (RadioGroup)findViewById(R.id.radiogroup_dashboard);
-        radioGroupProfileOptions.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        mRadioGroupProfileOptions = (RadioGroup)findViewById(R.id.radiogroup_dashboard);
+        mRadioGroupProfileOptions.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId){
@@ -72,6 +75,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
+    public void setRadioButton(int resId){
+        mRadioGroupProfileOptions.check(resId);
+    }
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -87,12 +94,13 @@ public class HomeActivity extends AppCompatActivity {
         Toast.makeText(getBaseContext(),"LogOut",Toast.LENGTH_SHORT).show();
     }
 
-    private void setFragment(Fragment fragment) {
+    public void setFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager() ;
-        fragmentManager.popBackStackImmediate();
+       // fragmentManager.popBackStackImmediate();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout,fragment);
         fragmentTransaction.commit();
+
     }
 
     @Override
