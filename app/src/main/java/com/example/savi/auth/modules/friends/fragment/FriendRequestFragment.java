@@ -50,4 +50,8 @@ public class FriendRequestFragment extends BaseFriendFragment {
         return friendAdapter;
     }
 
+    @Override
+    public CharSequence getTitle() {
+        return getActivity().getResources().getString(R.string.lbl_friend_requests);
+    }
 }

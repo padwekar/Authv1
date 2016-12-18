@@ -89,7 +89,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
     @Override
     public AllUserAdapter.AllUserViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         LayoutInflater inflater = (LayoutInflater) viewGroup.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.item_userlist, viewGroup, false);
+        View view = inflater.inflate(R.layout.item_user, viewGroup, false);
         return new AllUserViewHolder(view);
     }
 
@@ -99,9 +99,11 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
 
             //Picture Setting
             if (user.getPicPosition() >= 0) {
-                Picasso.with(mContext).load(mTypedArray.getResourceId(user.getPicPosition(), 0)).transform(new CircleTransform(Color.WHITE, 5)).fit().into(holder.mImageView);
+                //.transform(new CircleTransform(Color.WHITE, 5))
+                Picasso.with(mContext).load(mTypedArray.getResourceId(user.getPicPosition(), 0)).fit().into(holder.mImageView);
             } else {
-                Picasso.with(mContext).load(Uri.parse(user.getProfileDownloadUri())).transform(new CircleTransform(Color.WHITE, 5)).fit().into(holder.mImageView);
+                //transform(new CircleTransform(Color.WHITE, 5))
+                Picasso.with(mContext).load(Uri.parse(user.getProfileDownloadUri())).fit().into(holder.mImageView);
             }
 
             holder.mImageViewFriendshipStatus.setImageResource(R.drawable.ic_add_friend);

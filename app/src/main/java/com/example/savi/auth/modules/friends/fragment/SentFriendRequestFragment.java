@@ -44,4 +44,8 @@ public class SentFriendRequestFragment extends BaseFriendFragment{
         return getString(R.string.lbl_sent_requests);
     }
 
+    @Override
+    public CharSequence getTitle() {
+        return getActivity().getResources().getString(R.string.lbl_friend_requests);
+    }
 }

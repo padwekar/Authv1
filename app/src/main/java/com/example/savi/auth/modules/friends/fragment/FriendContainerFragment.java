@@ -10,12 +10,13 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
+import com.example.savi.auth.base.BaseViewPagerFragment;
 import com.example.savi.auth.modules.friends.adapter.FriendViewPagerAdapter;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class FriendContainerFragment extends Fragment {
+public class FriendContainerFragment extends BaseViewPagerFragment {
 
 
     public static FriendContainerFragment newInstance() {
@@ -30,6 +31,7 @@ public class FriendContainerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_friends, container, false);
 
         Fragment[] fragments = {FriendRequestFragment.newInstance(), FriendsFragment.newInstance(), SentFriendRequestFragment.newInstance()};
+
         List<Fragment> fragmentList = Arrays.asList(fragments);
 
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.viewpager_friends);
@@ -38,7 +40,10 @@ public class FriendContainerFragment extends Fragment {
         viewPagerAdapter.setFragmentList(fragmentList);
         viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(viewPagerAdapter);
-
         return view;
+    }
+
+    public CharSequence getTitle() {
+        return getActivity().getResources().getString(R.string.lbl_friends);
     }
 }

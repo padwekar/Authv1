@@ -30,7 +30,8 @@ public class HomeActivity extends BaseActivity {
 
     private TextView textViewLogOut ;
 
-    private Firebase mRef;
+    private Firebase
+            mRef;
     private List<String> allUserList = new ArrayList<>();;
     private String uid ;
 
@@ -42,6 +43,7 @@ public class HomeActivity extends BaseActivity {
 
         Firebase.setAndroidContext(getBaseContext());
         setContentView(R.layout.activity_dashboard);
+
 
         mRef = new Firebase("https://todocloudsavi.firebaseio.com/user");
         uid = getIntent().getStringExtra("uid");

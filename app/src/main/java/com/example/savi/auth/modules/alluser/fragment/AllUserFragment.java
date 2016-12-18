@@ -2,8 +2,7 @@ package com.example.savi.auth.modules.alluser.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
+import com.example.savi.auth.base.BaseViewPagerFragment;
 import com.example.savi.auth.constant.Constants;
 import com.example.savi.auth.modules.alluser.adapter.AllUserAdapter;
 import com.example.savi.auth.modules.alluser.operation.manager.UserManager;
@@ -26,9 +26,9 @@ import com.firebase.client.FirebaseError;
 
 import java.util.HashMap;
 
-import static com.example.savi.auth.constant.URLConstants.TODOCLOUD_ROOT_FIREBASE_URL;
+import static com.example.savi.auth.constant.URLConstants.TODOCLOUD_FIREBASE_ROOT_URL;
 
-public class AllUserFragment extends Fragment {
+public class AllUserFragment extends BaseViewPagerFragment {
 
     public static AllUserFragment newInstance() {
         return new AllUserFragment();
@@ -48,7 +48,8 @@ public class AllUserFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_alluser, container, false);
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressbar);
 
-        mFireBaseRef = new Firebase(TODOCLOUD_ROOT_FIREBASE_URL);
+        Firebase.setAndroidContext(getContext());
+        mFireBaseRef = new Firebase(TODOCLOUD_FIREBASE_ROOT_URL);
 
         mAllUserAdapter = new AllUserAdapter(getContext());
 
@@ -72,11 +73,15 @@ public class AllUserFragment extends Fragment {
         getCircleMap();
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_alluser);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
         recyclerView.setAdapter(mAllUserAdapter);
         getAllUser();
 
         return view;
+    }
+
+    public CharSequence getTitle() {
+        return getActivity().getResources().getString(R.string.lbl_all_user);
     }
 
     private void getAllUser() {
@@ -130,6 +135,8 @@ public class AllUserFragment extends Fragment {
                 String message = "Successful";
                 if (firebaseError != null)
                     message = firebaseError.getMessage();
+                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+
 
             }
         });

@@ -11,12 +11,16 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
+import com.example.savi.auth.constant.URLConstants;
+import com.example.savi.auth.pojo.User;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
+import java.util.Map;
+
 public class SignupActivity extends AppCompatActivity {
-    Firebase rootRef ;
-    EditText mEditTextName ,mEditTextEmail , mEditTextPassword ,mEditTextConfirmPassword ;
+    Firebase firebaseRef;
+    EditText mEditTextUserId,mEditTextEmail , mEditTextPassword ,mEditTextConfirmPassword ;
     TextInputLayout mTextInputLayoutName ,mTextInputLayoutEmail,mTextInputLayoutPassword ,mTextInputLayoutConfirmPassword ;
     Button mButtonSignUp ;
     ProgressBar mProgressBar ;
@@ -25,9 +29,9 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Firebase.setAndroidContext(this);
         setContentView(R.layout.activity_sign_up);
-        rootRef = new Firebase("https://todocloudsavi.firebaseio.com/");
+        firebaseRef = new Firebase("https://todocloudsavi.firebaseio.com/");
 
-        mEditTextName = (EditText)findViewById(R.id.edittext_name);
+        mEditTextUserId = (EditText)findViewById(R.id.edittext_name);
         mEditTextPassword = (EditText)findViewById(R.id.edittext_password);
         mEditTextConfirmPassword = (EditText)findViewById(R.id.edittext_confirm_password);
         mEditTextEmail = (EditText)findViewById(R.id.edittext_email);
@@ -47,17 +51,27 @@ public class SignupActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(isValid()){
                     mProgressBar.setVisibility(View.VISIBLE);
-                    String name = mEditTextEmail.getText().toString() ;
+                    final String userId = mEditTextUserId.getText().toString();
+                    final String emailId = mEditTextEmail.getText().toString() ;
                     String password = mEditTextPassword.getText().toString() ;
-                    rootRef.createUser(name, password, new Firebase.ResultHandler() {
+                    firebaseRef.createUser(emailId, password, new Firebase.ValueResultHandler<Map<String,Object>>() {
                         @Override
-                        public void onSuccess() {
+                        public void onSuccess(Map<String, Object> stringObjectMap) {
 
+                            User user = new User();
+                            user.setUid(stringObjectMap.get("uid").toString());
+                            user.setUserName(userId);
+                            user.setEmail(emailId);
+                            user.setProfileStatus(User.NEW);
+                            firebaseRef.child(URLConstants.USER_ID).child(userId).setValue(emailId);
+                            firebaseRef.child(URLConstants.USER_DETAIL).child(user.getUid()).setValue(user);
                             mProgressBar.setVisibility(View.GONE);
+
                             Intent intent = new Intent(SignupActivity.this,LoginActivity.class);
                             intent.putExtra("email",mEditTextEmail.getText().toString());
                             startActivity(intent);
-                            Toast.makeText(getBaseContext(),"You are Successfully logged in",Toast.LENGTH_SHORT).show();
+
+                            Toast.makeText(getBaseContext(),"You are Successfully Registered in",Toast.LENGTH_SHORT).show();
                             Toast.makeText(getBaseContext(),"Login to continue..",Toast.LENGTH_SHORT).show();
 
                         }
@@ -80,7 +94,7 @@ public class SignupActivity extends AppCompatActivity {
             isValid = false ;
             mTextInputLayoutEmail.setErrorEnabled(true);
             mTextInputLayoutEmail.setError(getResources().getString(R.string.error_msg_required));
-        }else  if(mEditTextName.getText().toString().equals("")){
+        }else  if(mEditTextUserId.getText().toString().equals("")){
             isValid = false ;
             mTextInputLayoutName.setErrorEnabled(true);
             mTextInputLayoutName.setError(getResources().getString(R.string.error_msg_required));

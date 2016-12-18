@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
+import com.example.savi.auth.base.BaseViewPagerFragment;
 import com.example.savi.auth.modules.friends.adapter.FriendAdapter;
 import com.example.savi.auth.operation.manager.SocialManager;
 import com.example.savi.auth.pojo.User;
@@ -23,7 +24,7 @@ import java.util.List;
 
 import static com.example.savi.auth.constant.Constants.TODOCLOUD_ROOT_FIREBASE_URL;
 
-public abstract class BaseFriendFragment extends Fragment{
+public abstract class BaseFriendFragment extends BaseViewPagerFragment{
 
     private FriendAdapter mFriendAdapter ;
     protected Firebase mFireBaseRef ;
@@ -44,8 +45,7 @@ public abstract class BaseFriendFragment extends Fragment{
         recyclerViewPersons.setAdapter(mFriendAdapter);
 
         mFireBaseRef = new Firebase(TODOCLOUD_ROOT_FIREBASE_URL);
-        String uid = mFireBaseRef.getAuth().getUid();
-        getPersonList(uid,getStatus(),getLimit());
+        getPersonList(userUid,getStatus(),getLimit());
 
         return view;
     }

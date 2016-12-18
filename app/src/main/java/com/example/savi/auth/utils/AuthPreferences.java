@@ -3,7 +3,9 @@ package com.example.savi.auth.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.savi.auth.pojo.User;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.gson.Gson;
 
 /**
  * Created by Savi on 23-10-2016.
@@ -15,6 +17,7 @@ public class AuthPreferences  {
     public static String AUTH_SHARED_PREF = "AUTH_SHARED_PREF" ;
 
     //ELEMENTS
+    public static String USER = "USER" ;
     public static String USER_UID = "USER_UID";
     public static String USER_TOKEN ="USER_TOKEN";
     public static String USER_NAME = "USER_NAME";
@@ -60,6 +63,11 @@ public class AuthPreferences  {
         return  sharedPreferences.getString(USER_NAME,"");
     }
 
+    public void clearPreferences(){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+    }
     public void setUserName(String token){
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(USER_NAME,token);
@@ -70,6 +78,17 @@ public class AuthPreferences  {
         SharedPreferences.Editor editor = sharedPreferences.edit() ;
         editor.putBoolean(IS_LOGGED_IN,status);
         editor.apply();
+    }
+
+    public void setUser(User user){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(USER,new Gson().toJson(user));
+        editor.apply();
+    }
+
+    public User getUser(){
+        User user = new Gson().fromJson(sharedPreferences.getString(USER,""),User.class) ;
+        return user==null?new User():user;
     }
 
     public boolean getLoginStatus(){

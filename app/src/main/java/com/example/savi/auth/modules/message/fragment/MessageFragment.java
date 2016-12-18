@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
+import com.example.savi.auth.base.BaseViewPagerFragment;
 import com.example.savi.auth.modules.alluser.adapter.AllUserAdapter;
 import com.example.savi.auth.modules.message.adapter.InboxAdapter;
 import com.example.savi.auth.pojo.MessageItem;
@@ -30,7 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MessageFragment extends Fragment {
+public class MessageFragment extends BaseViewPagerFragment {
 
     private  List<String> mUIDList ;
     private List<User> mUserList ;
@@ -51,6 +52,7 @@ public class MessageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         View view  = inflater.inflate(R.layout.fragment_messages,container,false);
+
         Toast.makeText(getContext(),"In MessageFragment",Toast.LENGTH_SHORT).show();
         Firebase.setAndroidContext(getContext());
         userHashMap = new HashMap<>();
@@ -224,5 +226,9 @@ public class MessageFragment extends Fragment {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout,fragment);
         fragmentTransaction.commit();
+    }
+
+    public CharSequence getTitle(){
+        return getActivity().getResources().getString(R.string.lbl_friends);
     }
 }

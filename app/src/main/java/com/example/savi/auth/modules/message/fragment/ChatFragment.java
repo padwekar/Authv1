@@ -45,21 +45,26 @@ public class ChatFragment extends Fragment {
 
     private ChatAdapter chatAdapter;
     private User receiver;
-    private String uid;
+
     private Firebase mRefUser, mFireBaseRef;
-    private RecyclerView recyclerViewMessages;
-    private EditText mEditTextMessageInput;
-    private List<MessageItem> messageItemList;
+    private String uid;
     private String firstElementKey;
+
     private int position = 0;
-    private Button mButtonShowMore;
     private boolean isDataAvailable = true;
+    private boolean scrollToBottom = true;
+
     private ImageView imageViewUpArrow;
     private ImageView imageViewDownArrow;
     private TextView textviewNewMessages;
+
     private LinearLayoutManager mLayoutManager;
-    private boolean scrollToBottom = true;
     private ProgressBar progressBar ;
+    private Button mButtonShowMore;
+    private RecyclerView recyclerViewMessages;
+    private EditText mEditTextMessageInput;
+    private List<MessageItem> messageItemList;
+
     public static ChatFragment newInstance(User receiver) {
         ChatFragment fragment = new ChatFragment();
         fragment.receiver = receiver;

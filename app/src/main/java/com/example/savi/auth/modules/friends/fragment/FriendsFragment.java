@@ -44,4 +44,9 @@ public class FriendsFragment extends BaseFriendFragment{
     String getHeader() {
         return getString(R.string.lbl_friends);
     }
+
+    @Override
+    public CharSequence getTitle() {
+        return getActivity().getResources().getString(R.string.lbl_friend_requests);
+    }
 }

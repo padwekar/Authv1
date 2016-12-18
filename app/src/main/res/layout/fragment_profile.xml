@@ -12,12 +12,15 @@
         android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
     <LinearLayout
-        android:layout_margin="@dimen/activity_vertical_margin"
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/activity_vertical_margin"
+        android:layout_marginRight="@dimen/activity_vertical_margin"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true">
 
         <ImageView
             android:id="@+id/imageview_profile"
@@ -25,6 +28,20 @@
             android:layout_width="100dp"
             android:layout_height="100dp" />
 
+        <android.support.design.widget.TextInputLayout
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/edittext_userid"
+                android:layout_width="match_parent"
+                android:text="User Id"
+                android:maxLength="15"
+                android:textColor="@android:color/holo_blue_bright"
+                android:enabled="false"
+                android:layout_height="wrap_content" />
+
+        </android.support.design.widget.TextInputLayout>
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -75,5 +92,5 @@
 
     </LinearLayout>
 
-    </RelativeLayout>
+</RelativeLayout>
 

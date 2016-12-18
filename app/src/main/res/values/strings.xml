@@ -9,7 +9,6 @@
     <string name="title_activity_to_do_list">ToDoListActivity</string>
     <string name="lbl_friend_requests">Friend Requests</string>
     <string name="lbl_sent_requests">Sent Requests</string>
-    <string name="lbl_friends">Friends</string>
     <string name="lbl_accept">Accept</string>
     <string name="reject">Reject</string>
     <integer-array name="avatars">
@@ -37,4 +36,23 @@
 
     //ERROR MESSAGE
     <string name="error_no_data_found">No Data Fouund</string>
+    <string name="lbl_all_user">All Users</string>
+    <string name="lbl_friends">Friends</string>
+    <string name="lbl_messages">Messages</string>
+
+
+
+    //Drawer Option
+    <string name="lbl_profile">Profile</string>
+    <string name="lbl_likes">Likes</string>
+    <string name="lbl_rate_us">Rate Us</string>
+    <string name="lbl_signout">Sign Out</string>
+
+    //Drawer Option Array
+    <array name="array_drawer_options">
+        <item>@string/lbl_profile</item>
+        <item>@string/lbl_likes</item>
+        <item>@string/lbl_rate_us</item>
+        <item>@string/lbl_signout</item>
+    </array>
 </resources>

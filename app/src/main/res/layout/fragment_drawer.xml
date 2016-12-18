@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_weight="0.5"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp">
+
+        <ImageView
+            android:id="@+id/imageview_profilepic"
+            android:background="@drawable/avatarf3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@null" />
+
+        <TextView
+            tools:text="Saurabh Padwekar"
+            android:textStyle="bold|italic"
+            android:layout_width="wrap_content"
+            android:textColor="@android:color/white"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_weight="0.7"
+        android:id="@+id/recycler_view_drawer_options"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+
+</LinearLayout>
