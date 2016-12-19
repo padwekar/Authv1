@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.example.savi.auth.R;
 import com.example.savi.auth.constant.Constants;
 import com.example.savi.auth.constant.URLConstants;
+import com.example.savi.auth.modules.dashboard.activity.DashboardActivity;
 import com.example.savi.auth.modules.profile.adapter.ProfilePicSelectAdapter;
 import com.example.savi.auth.modules.profile.operation.manager.ProfileManager;
 import com.example.savi.auth.pojo.User;
@@ -112,23 +113,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if(charSequence.toString().length()>3){
-                    ProfileManager manager = new ProfileManager();
-                    manager.checkIfUserNameAvailable(charSequence.toString(), new ProfileManager.OnUserNameVerification() {
-                        @Override
-                        public void onUserNameVerificationSuccess(boolean isAvailable) {
-                            if(isAvailable)
-                            mEditTextUserId.setCompoundDrawablesWithIntrinsicBounds(null,null,ContextCompat.getDrawable(getContext(),R.drawable.ic_check_black_24dp),null);
-                            else
-                            mEditTextUserId.setCompoundDrawablesWithIntrinsicBounds(null,null,ContextCompat.getDrawable(getContext(),R.drawable.ic_plus_black_24dp),null);
-
-                            isValidUsername = isAvailable ;
-                        }
-
-                        @Override
-                        public void onUserNameVerificationError(FirebaseError error) {
-                            Toast.makeText(getContext(),"error username varify",Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    checkIfUsernameAvailable(charSequence.toString());
                 }else {
                     mEditTextUserId.setCompoundDrawablesWithIntrinsicBounds(null,null,ContextCompat.getDrawable(getContext(),R.drawable.ic_plus_black_24dp),null);
                     isValidUsername = false ;
@@ -162,6 +147,7 @@ public class ProfileFragment extends Fragment {
                         } else {
                             Picasso.with(getContext()).load(mTypedArray.getResourceId(position, 0)).transform(new CircleTransform(Color.WHITE, 5)).fit().into(mImageViewProfile);
                             imageSdPath = null;
+                            imageUri = null ;
                             image_position = position;
                         }
                     }
@@ -175,10 +161,10 @@ public class ProfileFragment extends Fragment {
 
         mEditTextDisplayName.setText(mUser.getDisplayName());
         mEditTextStatus.setText(mUser.getStatus());
-        imageUri = mUser.getProfileDownloadUri();
+
         Picasso.with(getContext()).load(mTypedArray.getResourceId(mUser.getPicPosition(), 0)).transform(new CircleTransform(Color.WHITE, 5)).into(mImageViewProfile);
         if (mUser.getProfileDownloadUri() != null && getContext() != null)
-            Picasso.with(getContext()).load(Uri.parse(mUser.getProfileDownloadUri())).transform(new CircleTransform(Color.WHITE, 5)).into(mImageViewProfile);
+        Picasso.with(getContext()).load(Uri.parse(mUser.getProfileDownloadUri())).transform(new CircleTransform(Color.WHITE, 5)).into(mImageViewProfile);
 
         Button mButtonSubmit = (Button) view.findViewById(R.id.button_submit);
         mButtonSubmit.setOnClickListener(new View.OnClickListener() {
@@ -197,6 +183,26 @@ public class ProfileFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void checkIfUsernameAvailable(String requestedUserName) {
+        ProfileManager manager = new ProfileManager();
+        manager.checkIfUserNameAvailable(requestedUserName, new ProfileManager.OnUserNameVerification() {
+            @Override
+            public void onUserNameVerificationSuccess(boolean isAvailable) {
+                if(isAvailable)
+                    mEditTextUserId.setCompoundDrawablesWithIntrinsicBounds(null,null,ContextCompat.getDrawable(getContext(),R.drawable.ic_check_black_24dp),null);
+                else
+                    mEditTextUserId.setCompoundDrawablesWithIntrinsicBounds(null,null,ContextCompat.getDrawable(getContext(),R.drawable.ic_plus_black_24dp),null);
+
+                isValidUsername = isAvailable ;
+            }
+
+            @Override
+            public void onUserNameVerificationError(FirebaseError error) {
+                Toast.makeText(getContext(),"error username varify",Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private boolean isValid() {
@@ -224,9 +230,7 @@ public class ProfileFragment extends Fragment {
         user.setDisplayName(mEditTextDisplayName.getText().toString());
         user.setStatus(mEditTextStatus.getText().toString());
 
-        user.setEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-        if(FirebaseAuth.getInstance().getCurrentUser().getEmail()==null)
-        user.setEmail(FirebaseAuth.getInstance().getCurrentUser().getProviderData().get(0).getEmail());
+        user.setEmail(mUser.getEmail());
 
         user.setPicPosition(image_position);
         user.setProfileDownloadUri(imageUri);
@@ -239,6 +243,9 @@ public class ProfileFragment extends Fragment {
                 mRef.child(URLConstants.USER_DETAIL).child(user.getUid()).setPriority
                         (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
                 Toast.makeText(getContext(), "Profile Updated SuccessFully", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), DashboardActivity.class);
+                intent.putExtra("uid",user.getUid());
+                startActivity(intent);
             }
 
         });
@@ -259,7 +266,7 @@ public class ProfileFragment extends Fragment {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                     byte[] data = baos.toByteArray();
 
-                    UploadTask uploadTask = mStorageReference.child(mRef.getAuth().getProviderData().get("email").toString()).child("profilepic").putBytes(data);
+                    UploadTask uploadTask = mStorageReference.child(mUser.getEmail()).child("profilepic").putBytes(data);
                     uploadTask.addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception exception) {
@@ -271,7 +278,7 @@ public class ProfileFragment extends Fragment {
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                             imageUri = taskSnapshot.getDownloadUrl().toString();
-                            image_position = -1;
+                            image_position = 0;
                             Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
                             updateProfile();
 

@@ -69,7 +69,7 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
 
 
     public void addUser(User user) {
-        if(mUserList.contains(user)) {
+        if (mUserList.contains(user)) {
             int keyposition = mUserList.indexOf(user);
             mUserList.remove(keyposition);
             notifyItemRemoved(keyposition);
@@ -95,21 +95,18 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
 
     @Override
     public void onBindViewHolder(AllUserAdapter.AllUserViewHolder holder, int position) {
-            User user = mUserList.get(position);
+        User user = mUserList.get(position);
 
-            //Picture Setting
-            if (user.getPicPosition() >= 0) {
-                //.transform(new CircleTransform(Color.WHITE, 5))
-                Picasso.with(mContext).load(mTypedArray.getResourceId(user.getPicPosition(), 0)).fit().into(holder.mImageView);
-            } else {
-                //transform(new CircleTransform(Color.WHITE, 5))
-                Picasso.with(mContext).load(Uri.parse(user.getProfileDownloadUri())).fit().into(holder.mImageView);
-            }
+        //Picture Setting
+        //transform(new CircleTransform(Color.WHITE, 5))
+        Picasso.with(mContext).load(mTypedArray.getResourceId(user.getPicPosition(), 0)).fit().into(holder.mImageView);
+        if (user.getProfileDownloadUri() != null) {
+            Picasso.with(mContext).load(user.getProfileDownloadUri()).fit().into(holder.mImageView);
+        }
+        holder.mImageViewFriendshipStatus.setImageResource(R.drawable.ic_add_friend);
+        user.setFriendShipStatus(User.NOT_FRIENDS);
 
-            holder.mImageViewFriendshipStatus.setImageResource(R.drawable.ic_add_friend);
-            user.setFriendShipStatus(User.NOT_FRIENDS);
-
-            if(mCircleMap.get(user.getUid())!=null)
+        if (mCircleMap.get(user.getUid()) != null)
             switch (mCircleMap.get(user.getUid())) {
                 case User.REQUEST_SENT:
                     holder.mImageViewFriendshipStatus.setImageResource(R.drawable.ic_request_sent);
@@ -125,8 +122,8 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
                     break;
             }
 
-            holder.mTextviewName.setText(mUserList.get(position).getDisplayName());
-            holder.mTextviewStatus.setText(mUserList.get(position).getStatus());
+        holder.mTextviewName.setText(mUserList.get(position).getDisplayName());
+        holder.mTextviewStatus.setText(mUserList.get(position).getStatus());
     }
 
     @Override
@@ -166,9 +163,9 @@ public class AllUserAdapter extends RecyclerView.Adapter<AllUserAdapter.AllUserV
             mImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                        if (IOnItemClickListener != null) {
-                            IOnItemClickListener.onItemClick(mUserList.get(getAdapterPosition()).getUid());
-                        }
+                    if (IOnItemClickListener != null) {
+                        IOnItemClickListener.onItemClick(mUserList.get(getAdapterPosition()).getUid());
+                    }
                 }
             });
         }

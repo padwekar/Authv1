@@ -24,7 +24,6 @@ import com.example.savi.auth.R;
 import com.example.savi.auth.base.BaseFragment;
 import com.example.savi.auth.constant.Constants;
 import com.example.savi.auth.constant.URLConstants;
-import com.example.savi.auth.modules.account.activity.LoginActivity;
 import com.example.savi.auth.modules.account.activity.SignupActivity;
 import com.example.savi.auth.modules.dashboard.activity.DashboardActivity;
 import com.example.savi.auth.modules.profile.fragment.ProfileFragment;
@@ -38,12 +37,7 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -51,10 +45,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.util.ArrayList;
 
 
 public class LoginFragment extends BaseFragment {
@@ -142,8 +132,7 @@ public class LoginFragment extends BaseFragment {
         if(authData!=null){
             uid = authData.getUid() ;
             Toast.makeText(getContext(), "-"+authData.getAuth().get("email"), Toast.LENGTH_SHORT).show();
-
-        //    directUser(uid);
+            directUser(uid);
         }
 
         Button buttonGoogleSignIn = (Button) view.findViewById(R.id.button_google_sign_in);
@@ -222,7 +211,7 @@ public class LoginFragment extends BaseFragment {
 
     private void directUser(final String uid) {
         SocialManager manager = new SocialManager();
-        manager.getUserDetails(uid,new SocialManager.OnGetUserDetail() {
+        manager.getUserDetails(uid,Constants.SINGLE_VALUE_EVENT_LISTENER,new SocialManager.OnGetUserDetail() {
             @Override
             public void onGetUserDetailSuccess(User user) {
                 AuthPreferences.getInstance().setUser(user);
@@ -283,8 +272,8 @@ public class LoginFragment extends BaseFragment {
 
                         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                         String email = acct.getEmail();
-                        if(user!=null){
-                                user.updateEmail(email)
+                        if(user.getEmail()==null){
+                            user.updateEmail(acct.getEmail())
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task1) {

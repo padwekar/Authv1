@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/activity_horizontal_margin"
-    android:background="@drawable/blackwallpaper"
-    tools:context=".MainActivity">
+    android:background="@drawable/background1"
+    tools:context=".modules.account.activity.LoginActivity">
 
 
 
@@ -12,8 +12,20 @@
         android:id="@+id/logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_centerHorizontal="true"
         android:src="@drawable/logo_lifesavi" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:text="LifeSavi"
+        android:typeface="monospace"
+        android:textColor="@android:color/holo_green_light"
+        android:textSize="50dp" />
+
 
     <TextView
         android:layout_width="wrap_content"

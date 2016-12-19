@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/textview_option"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:padding="10dp"
         android:layout_toStartOf="@+id/imageview_icon"
         android:textColor="@android:color/holo_blue_dark"
@@ -19,7 +19,7 @@
         android:contentDescription="@null"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/ic_checkbox_marked_circle_outline_grey600_24dp"
+        android:src="@drawable/ic_checkbox_marked_circle_outline_grey600_18dp"
         android:id="@+id/imageview_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
