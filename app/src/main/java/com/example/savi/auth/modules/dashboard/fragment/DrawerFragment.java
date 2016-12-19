@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.savi.auth.R;
+import com.example.savi.auth.base.BaseFragment;
 import com.example.savi.auth.modules.account.activity.LoginActivity;
 import com.example.savi.auth.modules.account.fragment.LoginFragment;
 import com.example.savi.auth.modules.dashboard.adapter.DrawerAdapter;
@@ -27,10 +28,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 
 
-public class DrawerFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener{
-
-    private FirebaseAuth mAuth;
-    private GoogleApiClient mGoogleApiClient;
+public class DrawerFragment extends BaseFragment implements GoogleApiClient.OnConnectionFailedListener{
 
     public static DrawerFragment newInstance() {
         return new DrawerFragment();
@@ -56,17 +54,6 @@ public class DrawerFragment extends Fragment implements GoogleApiClient.OnConnec
             }
         });
 
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(getContext())
-                .enableAutoManage(getActivity()/* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
         return view;
     }
 
@@ -79,30 +66,6 @@ public class DrawerFragment extends Fragment implements GoogleApiClient.OnConnec
         fragmentTransaction.commit();
 
     }
-    private void signOut() {
-        // Firebase sign out
-        mAuth.signOut();
 
-        // Google sign out
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(@NonNull Status status) {
-                        Intent intent = new Intent(getActivity(), LoginActivity.class);
-                        startActivity(intent);
-                    }
-                });
-    }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        mGoogleApiClient.stopAutoManage(getActivity());
-        mGoogleApiClient.disconnect();
-    }
 }

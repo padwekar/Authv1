@@ -20,7 +20,6 @@ public class AuthApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-
         Picasso.Builder builder = new Picasso.Builder(this);
         builder.downloader(new OkHttpDownloader(this,Integer.MAX_VALUE));
         Picasso built = builder.build();
@@ -29,7 +28,6 @@ public class AuthApplication extends Application {
         Picasso.setSingletonInstance(built);
 
         mInstance = this;
-
     }
 
 

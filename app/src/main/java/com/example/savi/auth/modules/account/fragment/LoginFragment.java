@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
+import com.example.savi.auth.base.BaseFragment;
 import com.example.savi.auth.constant.Constants;
 import com.example.savi.auth.constant.URLConstants;
 import com.example.savi.auth.modules.account.activity.LoginActivity;
@@ -56,20 +57,15 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 
 
-public class LoginFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener, FirebaseAuth.AuthStateListener {
+public class LoginFragment extends BaseFragment {
 
     private static final int RC_SIGN_IN = 9090;
     private static final String TAG = "INSIDE";
 
-
     private EditText mEditTextEmail, mEditTextPassWord;
     private ProgressBar mProgressBar;
+    private Button buttonSignOut;
 
-    private Firebase firebaseRef;
-    public  FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-
-    public GoogleApiClient mGoogleApiClient;
     private String uid = "";
 
     public static LoginFragment newInstance() {
@@ -80,17 +76,20 @@ public class LoginFragment extends Fragment implements GoogleApiClient.OnConnect
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
-        Firebase.setAndroidContext(getContext());
-
-        mAuth = FirebaseAuth.getInstance();
-
-        firebaseRef = new Firebase(URLConstants.TODOCLOUD_FIREBASE_ROOT_URL);
 
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressbar);
         mProgressBar.setVisibility(View.GONE);
 
         mEditTextEmail = (EditText) view.findViewById(R.id.edittext_username);
         mEditTextPassWord = (EditText) view.findViewById(R.id.edittext_password);
+
+        buttonSignOut = (Button)view.findViewById(R.id.button_sign_out);
+        buttonSignOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signOut();
+            }
+        });
 
         TextView mTextViewForgotPassword = (TextView) view.findViewById(R.id.textview_forgot_password);
         mTextViewForgotPassword.setOnClickListener(new View.OnClickListener() {
@@ -136,7 +135,6 @@ public class LoginFragment extends Fragment implements GoogleApiClient.OnConnect
             }
         });
 
-        mAuth = FirebaseAuth.getInstance();
 
         Button buttonSignUp = (Button) view.findViewById(R.id.button_signup);
 
@@ -144,6 +142,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.OnConnect
         if(authData!=null){
             uid = authData.getUid() ;
             Toast.makeText(getContext(), "-"+authData.getAuth().get("email"), Toast.LENGTH_SHORT).show();
+
         //    directUser(uid);
         }
 
@@ -151,23 +150,11 @@ public class LoginFragment extends Fragment implements GoogleApiClient.OnConnect
         buttonGoogleSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(getString(R.string.default_web_client_id))
-                        .requestEmail()
-                        .build();
-
-                mGoogleApiClient = new GoogleApiClient.Builder(getContext())
-                        .enableAutoManage(getActivity()/* FragmentActivity */, LoginFragment.this /* OnConnectionFailedListener */)
-                        .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                        .build();
-
                 Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
                 startActivityForResult(signInIntent, RC_SIGN_IN);
             }
         });
 
-        mAuthListener = this;
 
         Button buttonLogIn = (Button) view.findViewById(R.id.button_login);
         buttonLogIn.setOnClickListener(new View.OnClickListener() {
@@ -227,9 +214,15 @@ public class LoginFragment extends Fragment implements GoogleApiClient.OnConnect
         });
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+    }
+
     private void directUser(final String uid) {
         SocialManager manager = new SocialManager();
-        manager.getUserDetails(uid, Constants.SINGLE_VALUE_EVENT_LISTENER, new SocialManager.OnGetUserDetail() {
+        manager.getUserDetails(uid,new SocialManager.OnGetUserDetail() {
             @Override
             public void onGetUserDetailSuccess(User user) {
                 AuthPreferences.getInstance().setUser(user);
@@ -261,12 +254,8 @@ public class LoginFragment extends Fragment implements GoogleApiClient.OnConnect
     }
 
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-    }
-
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+    private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         // [START_EXCLUDE silent]
         // [END_EXCLUDE]
@@ -275,7 +264,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.OnConnect
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+                    public void onComplete(@NonNull final Task<AuthResult> task) {
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
 
                         // If sign in fails, display a message to the user. If sign in succeeds
@@ -288,8 +277,28 @@ public class LoginFragment extends Fragment implements GoogleApiClient.OnConnect
                             return;
                         }
 
+                        Toast.makeText(getContext(), "FireBase Success", Toast.LENGTH_SHORT).show();
+                        buttonSignOut.setVisibility(View.VISIBLE);
 
-                        directUser(task.getResult().getUser().getUid());
+
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        String email = acct.getEmail();
+                        if(user!=null){
+                                user.updateEmail(email)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task1) {
+                                                if (task1.isSuccessful()) {
+                                                    directUser(task.getResult().getUser().getUid());
+                                                }
+                                            }
+                                        });
+                            }else {
+                                directUser(task.getResult().getUser().getUid());
+                            }
+
+
+
 
                         /*User user = new User();
                         user.setUid(task.getResult().getUser().getUid()) ;
@@ -306,27 +315,6 @@ public class LoginFragment extends Fragment implements GoogleApiClient.OnConnect
                 });
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mGoogleApiClient.stopAutoManage(getActivity());
-        mGoogleApiClient.disconnect();
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -351,21 +339,6 @@ public class LoginFragment extends Fragment implements GoogleApiClient.OnConnect
     }
 
 
-    @Override
-    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-        FirebaseUser user = firebaseAuth.getCurrentUser();
-        if (user != null) {
-            // User is signed in
-            //   Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-            Toast.makeText(getContext(), "onAuthStateChanged:signed_in:", Toast.LENGTH_SHORT).show();
-
-        } else {
-            // User is signed out
-            //  Log.d(TAG, "onAuthStateChanged:signed_out");
-            Toast.makeText(getContext(), "onAuthStateChanged:signed_out", Toast.LENGTH_SHORT).show();
-
-        }
-    }
 
     public void setFragment(Fragment fragment) {
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
@@ -375,21 +348,4 @@ public class LoginFragment extends Fragment implements GoogleApiClient.OnConnect
         fragmentTransaction.commit();
     }
 
-    public void signOut() {
-        // Firebase sign out
-        firebaseRef.unauth();
-        // mAuth.signOut();
-
-        // Google sign out
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(@NonNull Status status) {
-                        Intent intent = new Intent(getActivity(), LoginActivity.class);
-                        startActivity(intent);
-                    }
-                });
-
-new Gson().toJson("");
-     }
 }

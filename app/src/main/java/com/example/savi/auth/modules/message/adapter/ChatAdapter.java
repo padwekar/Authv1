@@ -91,9 +91,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ChatSelfViewHolder selfViewHolder = (ChatSelfViewHolder)holder;
             selfViewHolder.textViewSelfMessage.setText(messageItemList.get(position).getMessage() + "  -"+ messageItemList.get(position).getStatus());
             if(messageItemList.get(position).getStatus()==MessageItem.SENT){
-                selfViewHolder.imageViewStatus.setImageResource(R.drawable.ic_check_grey600_18dp);
+               // selfViewHolder.imageViewStatus.setImageResource(R.drawable.ic_check_grey600_18dp);
             }else if(messageItemList.get(position).getStatus()==MessageItem.DELIVERED){
-                selfViewHolder.imageViewStatus.setImageResource(R.drawable.ic_check_all_grey600_18dp);
+              //  selfViewHolder.imageViewStatus.setImageResource(R.drawable.ic_check_all_grey600_18dp);
             }else{
                 selfViewHolder.imageViewStatus.setImageResource(0);
             }

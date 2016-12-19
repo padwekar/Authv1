@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "201303990290-mg1keb5k7d4lho9aa2k8g89e1a68g24a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.savi.auth",
+            "certificate_hash": "8B84C05B489B1E0A523D7143543CD06EF0C3B5CF"
+          }
+        },
+        {
           "client_id": "201303990290-eegmiu6rcocnvrhtv5puloqb8g55t690.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
