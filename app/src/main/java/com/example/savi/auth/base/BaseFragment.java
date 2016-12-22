@@ -25,9 +25,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class BaseFragment extends Fragment implements  GoogleApiClient.OnConnectionFailedListener, FirebaseAuth.AuthStateListener {
 
-
+    public FirebaseAuth mAuth;
     protected Firebase firebaseRef;
-    public  FirebaseAuth mAuth;
     protected FirebaseAuth.AuthStateListener mAuthListener;
     protected GoogleApiClient mGoogleApiClient;
 
@@ -43,17 +42,7 @@ public class BaseFragment extends Fragment implements  GoogleApiClient.OnConnect
 
         mAuthListener = this;
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
 
-        mGoogleApiClient = new GoogleApiClient.Builder(getContext())
-                .enableAutoManage(getActivity()/* FragmentActivity */, BaseFragment.this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .addScope(new Scope(Scopes.PROFILE))
-                .addScope(new Scope(Scopes.EMAIL))
-                .build();
 
     }
 
@@ -61,6 +50,33 @@ public class BaseFragment extends Fragment implements  GoogleApiClient.OnConnect
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(mGoogleApiClient ==null || !mGoogleApiClient.isConnected()){
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(getString(R.string.default_web_client_id))
+                    .requestEmail()
+                    .build();
+
+            mGoogleApiClient = new GoogleApiClient.Builder(getContext())
+                    .enableAutoManage(getActivity()/* FragmentActivity */, BaseFragment.this /* OnConnectionFailedListener */)
+                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                    .addScope(new Scope(Scopes.PROFILE))
+                    .addScope(new Scope(Scopes.EMAIL))
+                    .build();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.stopAutoManage(getActivity());
+            mGoogleApiClient.disconnect();
+        }
     }
 
     @Override
@@ -81,8 +97,6 @@ public class BaseFragment extends Fragment implements  GoogleApiClient.OnConnect
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mGoogleApiClient.stopAutoManage(getActivity());
-        mGoogleApiClient.disconnect();
     }
 
     @Override
@@ -92,12 +106,10 @@ public class BaseFragment extends Fragment implements  GoogleApiClient.OnConnect
             // User is signed in
             //   Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
             Toast.makeText(getContext(), "onAuthStateChanged:signed_in:", Toast.LENGTH_SHORT).show();
-
         } else {
             // User is signed out
             //  Log.d(TAG, "onAuthStateChanged:signed_out");
             Toast.makeText(getContext(), "onAuthStateChanged:signed_out", Toast.LENGTH_SHORT).show();
-
         }
     }
 

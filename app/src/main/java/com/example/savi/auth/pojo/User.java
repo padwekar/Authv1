@@ -32,21 +32,15 @@ public class User {
     private String uid;
     private String userName ;
     private String displayName;
-    private String status;
+    private String status ;
     private String email;
     private String token;
     private String profileDownloadUri;
-    private int profileStatus;
+    private int profileStatus = NEW;
     private int picPosition;
     private transient int friendShipStatus;
 
     public User() {
-        super();
-        profileStatus = NEW ;
-        displayName = "";
-        status = "";
-        email = "";
-        picPosition = 0;
     }
 
     public String getUserName() {

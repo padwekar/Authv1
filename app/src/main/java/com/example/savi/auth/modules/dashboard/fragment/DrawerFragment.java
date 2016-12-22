@@ -1,9 +1,7 @@
 package com.example.savi.auth.modules.dashboard.fragment;
 
-import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,18 +15,11 @@ import android.widget.ImageView;
 
 import com.example.savi.auth.R;
 import com.example.savi.auth.base.BaseFragment;
-import com.example.savi.auth.modules.account.activity.LoginActivity;
-import com.example.savi.auth.modules.account.fragment.LoginFragment;
 import com.example.savi.auth.modules.dashboard.adapter.DrawerAdapter;
 import com.example.savi.auth.modules.profile.fragment.ProfileFragment;
 import com.example.savi.auth.pojo.User;
 import com.example.savi.auth.utils.AuthPreferences;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 

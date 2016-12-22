@@ -55,6 +55,7 @@ public class LoginFragment extends BaseFragment {
     private EditText mEditTextEmail, mEditTextPassWord;
     private ProgressBar mProgressBar;
     private Button buttonSignOut;
+    private String emailId = "";
 
     private String uid = "";
 
@@ -226,9 +227,10 @@ public class LoginFragment extends BaseFragment {
             public void onGetUserDetailFailure(FirebaseError e) {
                 User user = new User();
                 user.setUid(uid);
-                user.setEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+                user.setEmail(emailId);
                 user.setProfileStatus(User.NEW);
                 firebaseRef.child(URLConstants.USER_DETAIL).child(user.getUid()).setValue(user);
+                AuthPreferences.getInstance().setUser(user);
                 setFragment(ProfileFragment.newInstance());
             }
         });
@@ -245,6 +247,7 @@ public class LoginFragment extends BaseFragment {
 
 
     private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
+        emailId = acct.getEmail();
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         // [START_EXCLUDE silent]
         // [END_EXCLUDE]
@@ -271,9 +274,9 @@ public class LoginFragment extends BaseFragment {
 
 
                         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                        String email = acct.getEmail();
+
                         if(user.getEmail()==null){
-                            user.updateEmail(acct.getEmail())
+                            user.updateEmail(emailId)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task1) {

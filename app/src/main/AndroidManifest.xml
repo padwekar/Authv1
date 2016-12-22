@@ -44,13 +44,8 @@
         </service>
 
         <activity android:name=".base.BaseActivity" />
-        <activity android:name=".modules.dashboard.activity.DashboardActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity android:name=".modules.dashboard.activity.DashboardActivity"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>

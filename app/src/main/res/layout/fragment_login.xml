@@ -16,16 +16,6 @@
         android:layout_centerHorizontal="true"
         android:src="@drawable/logo_lifesavi" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="@dimen/activity_horizontal_margin"
-        android:text="LifeSavi"
-        android:typeface="monospace"
-        android:textColor="@android:color/holo_green_light"
-        android:textSize="50dp" />
-
 
     <TextView
         android:layout_width="wrap_content"
@@ -33,6 +23,7 @@
         android:layout_above="@+id/linearlayout"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:fontFamily="serif-monospace"
         android:text="Login"
         android:textColor="@android:color/white"
         android:textSize="24dp" />
@@ -53,6 +44,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Username"
+                android:fontFamily="serif-monospace"
                 android:textColor="@android:color/white"
                 android:textColorHint="@android:color/holo_orange_dark" />
         </android.support.design.widget.TextInputLayout>
@@ -71,20 +63,11 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/username"
                 android:hint="Password"
+                android:fontFamily="serif-monospace"
                 android:textColor="@android:color/white"
                 android:textColorHint="@android:color/holo_orange_dark" />
         </android.support.design.widget.TextInputLayout>
     </LinearLayout>
-
-    <Button
-        android:id="@+id/button_login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/linearlayout"
-        android:background="#50757575"
-        android:text="Log In"
-        android:textColor="@android:color/white"
-        android:textSize="12sp" />
 
     <Button
         android:id="@+id/button_signup"
@@ -94,6 +77,7 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_toRightOf="@+id/button_login"
         android:background="#50757575"
+        android:fontFamily="serif-monospace"
         android:text="New User ? Sign Up"
         android:textColor="@android:color/holo_red_dark"
         android:textSize="12sp" />
@@ -110,7 +94,8 @@
         android:id="@+id/textview_forgot_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/linearlayout_google_login"
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/button_signup"
         android:layout_centerHorizontal="true"
         android:text="Forgot Password ?"
         android:textColor="@android:color/white"
@@ -129,6 +114,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Login With "
+            android:fontFamily="serif-monospace"
             android:textColor="@color/cardview_light_background" />
 
         <Button
@@ -146,6 +132,31 @@
         android:layout_above="@id/linearlayout_google_login"
         android:background="#50757575"
         android:text="Sign Out"
+        android:fontFamily="serif-monospace"
         android:textColor="@android:color/holo_red_dark"
         android:textSize="12sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" Life Savi "
+        android:textStyle="bold"
+        android:fontFamily="serif-monospace"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/textView" />
+
+    <Button
+        android:id="@+id/button_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#50757575"
+        android:text="Log In"
+        android:fontFamily="serif-monospace"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:layout_below="@+id/linearlayout"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>
