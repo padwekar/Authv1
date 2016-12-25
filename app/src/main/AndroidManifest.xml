@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
-
     <application
         android:name=".utils.AuthApplication"
         android:allowBackup="true"
@@ -43,9 +42,10 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".base.BaseActivity" />
-        <activity android:name=".modules.dashboard.activity.DashboardActivity"/>
 
+        <activity android:name=".modules.dashboard.activity.DashboardActivity" />
+        <activity android:name=".modules.profile.ProfileActivity" />
+        <activity android:name=".modules.poll.activity.PollActivity"/>
     </application>
 
 </manifest>

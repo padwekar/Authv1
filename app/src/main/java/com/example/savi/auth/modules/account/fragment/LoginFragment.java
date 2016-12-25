@@ -5,9 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,12 +18,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.savi.auth.R;
-import com.example.savi.auth.base.BaseFragment;
+import com.example.savi.auth.base.BaseAuthFragment;
 import com.example.savi.auth.constant.Constants;
 import com.example.savi.auth.constant.URLConstants;
 import com.example.savi.auth.modules.account.activity.SignupActivity;
 import com.example.savi.auth.modules.dashboard.activity.DashboardActivity;
-import com.example.savi.auth.modules.profile.fragment.ProfileFragment;
+import com.example.savi.auth.modules.profile.ProfileActivity;
 import com.example.savi.auth.operation.manager.SocialManager;
 import com.example.savi.auth.pojo.User;
 import com.example.savi.auth.utils.AuthPreferences;
@@ -47,7 +44,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 
-public class LoginFragment extends BaseFragment {
+public class LoginFragment extends BaseAuthFragment {
 
     private static final int RC_SIGN_IN = 9090;
     private static final String TAG = "INSIDE";
@@ -101,7 +98,7 @@ public class LoginFragment extends BaseFragment {
                     public void onClick(final DialogInterface dialog, int which) {
                         String email = input.getText().toString();
                         if (!email.equals("")) {
-                            firebaseRef.resetPassword(email, new Firebase.ResultHandler() {
+                            fireBaseRef.resetPassword(email, new Firebase.ResultHandler() {
                                 @Override
                                 public void onSuccess() {
                                     Toast.makeText(getContext(), "Reset email has been sent to your email", Toast.LENGTH_SHORT).show();
@@ -129,17 +126,18 @@ public class LoginFragment extends BaseFragment {
 
         Button buttonSignUp = (Button) view.findViewById(R.id.button_signup);
 
-       AuthData authData = firebaseRef.getAuth();
-        if(authData!=null){
+       AuthData authData = fireBaseRef.getAuth();
+       /* if(authData!=null){
             uid = authData.getUid() ;
             Toast.makeText(getContext(), "-"+authData.getAuth().get("email"), Toast.LENGTH_SHORT).show();
             directUser(uid);
-        }
+        }*/
 
-        Button buttonGoogleSignIn = (Button) view.findViewById(R.id.button_google_sign_in);
+       Button buttonGoogleSignIn = (Button) view.findViewById(R.id.button_google_sign_in);
         buttonGoogleSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                showProgressDialog("Signin with Google");
                 Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
                 startActivityForResult(signInIntent, RC_SIGN_IN);
             }
@@ -150,7 +148,8 @@ public class LoginFragment extends BaseFragment {
         buttonLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mProgressBar.setVisibility(View.VISIBLE);
+               // mProgressBar.setVisibility(View.VISIBLE);
+                showProgressDialog();
                 String username = mEditTextEmail.getText().toString();
                 final String password = mEditTextPassWord.getText().toString();
                 if (android.util.Patterns.EMAIL_ADDRESS.matcher(username).matches()) {
@@ -159,7 +158,7 @@ public class LoginFragment extends BaseFragment {
                 } else {
                     //get the emailId stored against username
 
-                    firebaseRef.child("user_ids").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
+                    fireBaseRef.child("user_ids").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if (dataSnapshot != null) {
@@ -189,17 +188,20 @@ public class LoginFragment extends BaseFragment {
     }
 
     private void performLogin(String emailId, String password) {
-        firebaseRef.authWithPassword(emailId, password, new Firebase.AuthResultHandler() {
+        showProgressDialog("Logging in");
+        fireBaseRef.authWithPassword(emailId, password, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
-                mProgressBar.setVisibility(View.GONE);
-                directUser(uid);
+               // mProgressBar.setVisibility(View.GONE);
+                dismissProgressDialog();
+                directUser(authData.getUid());
             }
 
             @Override
             public void onAuthenticationError(FirebaseError firebaseError) {
+                dismissProgressDialog();
                 Toast.makeText(getContext(), firebaseError.toString(), Toast.LENGTH_SHORT).show();
-                mProgressBar.setVisibility(View.GONE);
+               // mProgressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -212,13 +214,14 @@ public class LoginFragment extends BaseFragment {
 
     private void directUser(final String uid) {
         SocialManager manager = new SocialManager();
+        showProgressDialog("Directing User");
         manager.getUserDetails(uid,Constants.SINGLE_VALUE_EVENT_LISTENER,new SocialManager.OnGetUserDetail() {
             @Override
             public void onGetUserDetailSuccess(User user) {
                 AuthPreferences.getInstance().setUser(user);
-
+                dismissProgressDialog();
                 if (user.getProfileStatus() == User.NEW)
-                    setFragment(ProfileFragment.newInstance());
+                    startActivity(new Intent(getContext(), ProfileActivity.class));
                 else
                     startHomeActivity(user.getUid());
             }
@@ -226,12 +229,13 @@ public class LoginFragment extends BaseFragment {
             @Override
             public void onGetUserDetailFailure(FirebaseError e) {
                 User user = new User();
+                dismissProgressDialog();
                 user.setUid(uid);
                 user.setEmail(emailId);
                 user.setProfileStatus(User.NEW);
-                firebaseRef.child(URLConstants.USER_DETAIL).child(user.getUid()).setValue(user);
+                fireBaseRef.child(URLConstants.USER_DETAIL).child(user.getUid()).setValue(user);
                 AuthPreferences.getInstance().setUser(user);
-                setFragment(ProfileFragment.newInstance());
+                startActivity(new Intent(getContext(), ProfileActivity.class));
             }
         });
     }
@@ -247,6 +251,7 @@ public class LoginFragment extends BaseFragment {
 
 
     private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
+        showProgressDialog("Signin with Firebase");
         emailId = acct.getEmail();
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         // [START_EXCLUDE silent]
@@ -281,11 +286,13 @@ public class LoginFragment extends BaseFragment {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task1) {
                                                 if (task1.isSuccessful()) {
+                                                    dismissProgressDialog();
                                                     directUser(task.getResult().getUser().getUid());
                                                 }
                                             }
                                         });
                             }else {
+                                dismissProgressDialog();
                                 directUser(task.getResult().getUser().getUid());
                             }
 
@@ -332,12 +339,12 @@ public class LoginFragment extends BaseFragment {
 
 
 
-    public void setFragment(Fragment fragment) {
+  /*  public void setFragment(Fragment fragment) {
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         // fragmentManager.popBackStackImmediate();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
     }
-
+*/
 }

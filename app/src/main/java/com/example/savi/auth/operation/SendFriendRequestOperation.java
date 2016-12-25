@@ -6,9 +6,6 @@ import com.example.savi.auth.utils.AuthException;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Created by Savi on 23-10-2016.
- */
 
 public class SendFriendRequestOperation extends WebServiceOperation{
 

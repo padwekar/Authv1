@@ -52,21 +52,6 @@
         android:layout_below="@+id/logo"
         android:layout_alignParentStart="true"
         android:layout_marginTop="40dp">
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textinputlayout_name"
-            >
-            <EditText
-                android:id="@+id/edittext_name"
-                android:hint="user_Id"
-                android:maxLines="1"
-                android:textColor="@android:color/white"
-                android:textColorHint="@android:color/holo_orange_dark"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </android.support.design.widget.TextInputLayout>
-
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"

@@ -1,24 +1,23 @@
-package com.example.savi.auth.modules.account.activity;
+package com.example.savi.auth.modules.profile;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 
 import com.example.savi.auth.R;
-import com.example.savi.auth.modules.account.fragment.LoginFragment;
-import com.example.savi.auth.utils.AuthPreferences;
+import com.example.savi.auth.modules.profile.fragment.ProfileFragment;
 
-public class LoginActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        AuthPreferences.getInstance().clearPreferences();
-        setFragment(LoginFragment.newInstance());
+        setContentView(R.layout.activity_profile);
+        setFragment(ProfileFragment.newInstance());
     }
+
 
     public void setFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();

@@ -42,7 +42,6 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -173,12 +172,11 @@ public class ProfileFragment extends Fragment {
                 if(isValid()){
                     mProgressbar.setVisibility(View.VISIBLE);
                     if (imageSdPath != null) {
-                        getImageUri();
+                        getImageUriAndUpdateProfile();
                     } else {
                         updateProfile();
                     }
                 }
-
             }
         });
 
@@ -226,10 +224,10 @@ public class ProfileFragment extends Fragment {
         }
 
         user.setProfileStatus(User.ACTIVE);
-        user.setUid(FirebaseAuth.getInstance().getCurrentUser().getUid());
         user.setDisplayName(mEditTextDisplayName.getText().toString());
         user.setStatus(mEditTextStatus.getText().toString());
 
+        user.setUid(mUser.getUid());
         user.setEmail(mUser.getEmail());
 
         user.setPicPosition(image_position);
@@ -255,7 +253,7 @@ public class ProfileFragment extends Fragment {
 
     }
 
-    private void getImageUri() {
+    private void getImageUriAndUpdateProfile() {
         ImageCompressionAsyncTask imageCompressionAsyncTask = new ImageCompressionAsyncTask(getActivity());
         imageCompressionAsyncTask.setOnImageCompressed(new ImageCompressionAsyncTask.OnImageCompressed() {
             @Override

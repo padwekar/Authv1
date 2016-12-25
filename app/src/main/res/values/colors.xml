@@ -2,4 +2,16 @@
 <resources>
     <color name="primary">#9C27B0</color>
     <color name="accent">#F50057</color>
+
+    <color name="green">#00E676 </color>
+    <color name="red">#F44336</color>
+    <color name="white">#FFFFFF</color>
+    <color name="yellow">#fdd835 </color>
+
+    <array name="status_color_array">
+        <item>@color/green</item>
+        <item>@color/yellow</item>
+        <item>@color/red</item>
+    </array>
+
 </resources>

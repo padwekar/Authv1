@@ -41,7 +41,6 @@
     <string name="lbl_messages">Messages</string>
 
 
-
     //Drawer Option
     <string name="lbl_profile">Profile</string>
     <string name="lbl_likes">Likes</string>
@@ -55,4 +54,39 @@
         <item>@string/lbl_rate_us</item>
         <item>@string/lbl_signout</item>
     </array>
+
+    //Group
+    <string name="lbl_open">Open</string>
+    <string name="lbl_active">Active</string>
+    <string name="lbl_closed">Closed</string>
+    <string name="lbl_done">Done</string>
+    <string name="lbl_cancel">Cancel</string>
+    <string name="lbl_password_protected">Password Protected</string>
+    <string name="lbl_password">Password</string>
+    <string name="lbl_max_members">Max Members</string>
+    <string name="lbl_group_name">Group Name</string>
+    <string name="lbl_status">Group Status</string>
+    <string name="lbl_members" formatted="false">Members : %d / %d</string>
+    <string-array name="group_status_array">
+        <item>@string/lbl_open</item>
+        <item>@string/lbl_active</item>
+        <item>@string/lbl_closed</item>
+    </string-array>
+    <string-array name="member_count">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+    </string-array>
 </resources>

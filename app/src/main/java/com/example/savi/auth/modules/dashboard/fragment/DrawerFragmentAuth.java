@@ -1,22 +1,21 @@
 package com.example.savi.auth.modules.dashboard.fragment;
 
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.savi.auth.R;
-import com.example.savi.auth.base.BaseFragment;
+import com.example.savi.auth.base.BaseAuthFragment;
 import com.example.savi.auth.modules.dashboard.adapter.DrawerAdapter;
-import com.example.savi.auth.modules.profile.fragment.ProfileFragment;
+import com.example.savi.auth.modules.profile.ProfileActivity;
 import com.example.savi.auth.pojo.User;
 import com.example.savi.auth.utils.AuthPreferences;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -24,10 +23,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
 
-public class DrawerFragment extends BaseFragment implements GoogleApiClient.OnConnectionFailedListener{
+public class DrawerFragmentAuth extends BaseAuthFragment implements GoogleApiClient.OnConnectionFailedListener{
 
-    public static DrawerFragment newInstance() {
-        return new DrawerFragment();
+    public static DrawerFragmentAuth newInstance() {
+        return new DrawerFragmentAuth();
     }
 
     @Nullable
@@ -46,6 +45,13 @@ public class DrawerFragment extends BaseFragment implements GoogleApiClient.OnCo
             Picasso.with(getContext()).load(user.getProfileDownloadUri()).fit().into(imageViewProfilePic);
         }
 
+        TextView textViewDisplayName = (TextView)view.findViewById(R.id.textview_display_name);
+        textViewDisplayName.setText(user.getDisplayName());
+
+        TextView textViewUserName = (TextView)view.findViewById(R.id.textview_username);
+        textViewUserName.setText("@"+user.getUserName());
+
+
         RecyclerView recyclerViewOptions = (RecyclerView)view.findViewById(R.id.recycler_view_drawer_options);
         DrawerAdapter drawerAdapter = new DrawerAdapter(getContext());
         recyclerViewOptions.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -56,7 +62,7 @@ public class DrawerFragment extends BaseFragment implements GoogleApiClient.OnCo
                 if(position==3){
                     signOut();
                 }if(position==0){
-                    setFragment(ProfileFragment.newInstance(),R.id.layout_middle_container);
+                    startActivity(new Intent(getContext(), ProfileActivity.class));
                 }
             }
         });
@@ -64,15 +70,8 @@ public class DrawerFragment extends BaseFragment implements GoogleApiClient.OnCo
         return view;
     }
 
-    public void setFragment(Fragment fragment ,int resId) {
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager() ;
-        //fragmentManager.popBackStackImmediate();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(resId,fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
 
-    }
+ /*   */
 
 
 }

@@ -19,11 +19,15 @@ import com.firebase.client.FirebaseError;
 import java.util.Map;
 
 public class SignupActivity extends AppCompatActivity {
-    Firebase firebaseRef;
-    EditText mEditTextUserId,mEditTextEmail , mEditTextPassword ,mEditTextConfirmPassword ;
-    TextInputLayout mTextInputLayoutName ,mTextInputLayoutEmail,mTextInputLayoutPassword ,mTextInputLayoutConfirmPassword ;
-    Button mButtonSignUp ;
-    ProgressBar mProgressBar ;
+
+    private Firebase firebaseRef;
+    private EditText mEditTextEmail , mEditTextPassword ,mEditTextConfirmPassword ;
+
+    private TextInputLayout mTextInputLayoutEmail,mTextInputLayoutPassword ,mTextInputLayoutConfirmPassword ;
+
+    private Button mButtonSignUp ;
+    private ProgressBar mProgressBar ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,12 +35,10 @@ public class SignupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
         firebaseRef = new Firebase("https://todocloudsavi.firebaseio.com/");
 
-        mEditTextUserId = (EditText)findViewById(R.id.edittext_name);
         mEditTextPassword = (EditText)findViewById(R.id.edittext_password);
         mEditTextConfirmPassword = (EditText)findViewById(R.id.edittext_confirm_password);
         mEditTextEmail = (EditText)findViewById(R.id.edittext_email);
 
-        mTextInputLayoutName = (TextInputLayout)findViewById(R.id.textinputlayout_name);
         mTextInputLayoutEmail = (TextInputLayout)findViewById(R.id.textinputlayout_email);
         mTextInputLayoutPassword = (TextInputLayout)findViewById(R.id.textinputlayout_password);
         mTextInputLayoutConfirmPassword = (TextInputLayout)findViewById(R.id.textinputlayout_confirm_password);
@@ -51,7 +53,6 @@ public class SignupActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(isValid()){
                     mProgressBar.setVisibility(View.VISIBLE);
-                    final String userId = mEditTextUserId.getText().toString();
                     final String emailId = mEditTextEmail.getText().toString() ;
                     String password = mEditTextPassword.getText().toString() ;
                     firebaseRef.createUser(emailId, password, new Firebase.ValueResultHandler<Map<String,Object>>() {
@@ -60,10 +61,8 @@ public class SignupActivity extends AppCompatActivity {
 
                             User user = new User();
                             user.setUid(stringObjectMap.get("uid").toString());
-                            user.setUserName(userId);
                             user.setEmail(emailId);
                             user.setProfileStatus(User.NEW);
-                            firebaseRef.child(URLConstants.USER_ID).child(userId).setValue(emailId);
                             firebaseRef.child(URLConstants.USER_DETAIL).child(user.getUid()).setValue(user);
                             mProgressBar.setVisibility(View.GONE);
 
@@ -94,11 +93,7 @@ public class SignupActivity extends AppCompatActivity {
             isValid = false ;
             mTextInputLayoutEmail.setErrorEnabled(true);
             mTextInputLayoutEmail.setError(getResources().getString(R.string.error_msg_required));
-        }else  if(mEditTextUserId.getText().toString().equals("")){
-            isValid = false ;
-            mTextInputLayoutName.setErrorEnabled(true);
-            mTextInputLayoutName.setError(getResources().getString(R.string.error_msg_required));
-        } else if(mEditTextPassword.getText().toString().equals("")){
+        }else if(mEditTextPassword.getText().toString().equals("")){
             isValid = false ;
             mTextInputLayoutPassword.setErrorEnabled(true);
             mTextInputLayoutPassword.setError(getResources().getString(R.string.error_msg_required));

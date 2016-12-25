@@ -5,6 +5,7 @@ import com.example.savi.auth.base.BaseViewPagerFragment;
 import com.example.savi.auth.modules.alluser.fragment.AllUserFragment;
 import com.example.savi.auth.modules.friends.fragment.FriendContainerFragment;
 import com.example.savi.auth.modules.message.fragment.MessageFragment;
+import com.example.savi.auth.modules.poll.fragment.GroupListFragment;
 
 public class ViewPagerFragments {
     private BaseViewPagerFragment[] dashboardFragments;
@@ -13,7 +14,7 @@ public class ViewPagerFragments {
 
     public ViewPagerFragments() {
         this.dashboardFragments = new BaseViewPagerFragment[]{AllUserFragment.newInstance(),
-                MessageFragment.newInstance(), FriendContainerFragment.newInstance()};
+                MessageFragment.newInstance(), GroupListFragment.newInstance(), FriendContainerFragment.newInstance()};
     }
 
     public BaseViewPagerFragment[] getDashboardFragments() {

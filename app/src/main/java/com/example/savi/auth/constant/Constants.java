@@ -24,6 +24,6 @@ public class Constants {
     public final static int SINGLE_VALUE_EVENT_LISTENER = -111 ;
     public final static int VALUE_EVENT_LISTENER = -222;
 
-    public final static String[] viewPagerFragmentTitle= {"All Users","Messages","Friends"};
+    public final static String[] viewPagerFragmentTitle= {"All Users","Messages","Poll (Beta)","Friends"};
 
 }
