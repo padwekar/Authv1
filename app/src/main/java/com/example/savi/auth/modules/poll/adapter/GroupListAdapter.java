@@ -32,8 +32,8 @@ public class GroupListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private TypedArray mColorTypedArray;
     private String[] mHeaderArray;
 
-    public final static int HEADER = 0 ;
-    public final static int CHILD = HEADER+1 ;
+    private final int HEADER = 0 ;
+    private final int CHILD = HEADER+1 ;
 
     public GroupListAdapter(Context mContext) {
         this.mContext = mContext;
