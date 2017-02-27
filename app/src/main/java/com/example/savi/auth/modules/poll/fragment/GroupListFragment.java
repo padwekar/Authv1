@@ -20,7 +20,7 @@ public class GroupListFragment extends BaseViewPagerFragment {
     private GroupListAdapter mGroupListAdapter;
 
     public static GroupListFragment newInstance() {
-         return new GroupListFragment();
+        return new GroupListFragment();
     }
 
     @Nullable
@@ -47,13 +47,12 @@ public class GroupListFragment extends BaseViewPagerFragment {
 
                     @Override
                     public void onCancelClick() {
+
                         fragment.dismiss();
                     }
                 });
-
-            //
-                    fragment.show(getFragmentManager(),"dialog");
-              //  setFragment(fragment,R.id.layout_middle_container);
+                fragment.show(getFragmentManager(), "dialog");
+                //  setFragment(fragment,R.id.layout_middle_container);
             }
         });
         return view;

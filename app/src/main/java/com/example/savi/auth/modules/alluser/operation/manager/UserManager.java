@@ -31,9 +31,11 @@ public class UserManager {
             }
 
             @Override
-            public void onCancelled(FirebaseError error) {
-                if(listener!=null)listener.onCancelled(error);
-            }
+            public void onCancelled(FirebaseError error) {if(listener!=null)listener.onCancelled(error);}
         });
+    }
+
+    public void getUserFrom(String startsWithUid, GetAllUserOperation.OnGetAllUserListener listener){
+
     }
 }

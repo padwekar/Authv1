@@ -3,6 +3,7 @@ package com.example.savi.auth.modules.alluser.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 import com.example.savi.auth.R;
 import com.example.savi.auth.base.BaseViewPagerFragment;
 import com.example.savi.auth.constant.Constants;
+import com.example.savi.auth.constant.URLConstants;
 import com.example.savi.auth.modules.alluser.adapter.AllUserAdapter;
 import com.example.savi.auth.modules.alluser.operation.manager.UserManager;
 import com.example.savi.auth.modules.dashboard.activity.HomeActivity;
@@ -59,7 +61,9 @@ public class AllUserFragment extends BaseViewPagerFragment {
         mAllUserAdapter.setOnFriendShipStatusClickListener(new AllUserAdapter.OnFriendShipStatusClickListener() {
             @Override
             public void onFriedShipStatusClick(final User user) {
-                sendFriendRequest(user);
+                mFireBaseRef.child(URLConstants.USER_DETAIL).child(user.getUid()).removeValue();
+                //TODO : Uncomment it later
+                //sendFriendRequest(user);
             }
         });
 
@@ -73,7 +77,8 @@ public class AllUserFragment extends BaseViewPagerFragment {
         getCircleMap();
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_alluser);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
+//        recyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(mAllUserAdapter);
         getAllUser();
 

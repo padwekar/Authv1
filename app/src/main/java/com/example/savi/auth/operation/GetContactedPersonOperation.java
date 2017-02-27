@@ -27,6 +27,7 @@ public class GetContactedPersonOperation {
         fireBaseRef.child(uid).orderByValue().equalTo(status).limitToLast(limit).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
                 if(onGetContactedPersonOperation!=null){
                     if(dataSnapshot==null || dataSnapshot.getChildren()==null){ onCancelled(new FirebaseError(-400, OperationConstants.NO_DATA_FOUND)); return;}
                     final List<User> userList = new ArrayList<>();

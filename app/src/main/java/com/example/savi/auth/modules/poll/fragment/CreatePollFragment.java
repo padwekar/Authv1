@@ -2,7 +2,6 @@ package com.example.savi.auth.modules.poll.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -27,22 +26,22 @@ import butterknife.ButterKnife;
 
 public class CreatePollFragment extends BaseFragment {
 
-    private Group mGroup ;
+    private Group mGroup;
 
     @BindView(R.id.edittext_group_name)
-    EditText mEditTextGroupName ;
+    EditText mEditTextGroupName;
 
     @BindView(R.id.spinner_max_members)
-    Spinner mSpinnerMaxMember ;
+    Spinner mSpinnerMaxMember;
 
     @BindView(R.id.switch_password)
-    Switch mSwitchPassword ;
+    Switch mSwitchPassword;
 
     @BindView(R.id.edittext_password)
     EditText mEditTextPassword;
 
     @BindView(R.id.radiogroup_group_status)
-    RadioGroup mRadioGroupStatus ;
+    RadioGroup mRadioGroupStatus;
 
 /*
     @BindView(R.id.textinputlayout_group_name)
@@ -50,22 +49,23 @@ public class CreatePollFragment extends BaseFragment {
 */
 
     @BindView(R.id.textinputlayout_password)
-    TextInputLayout mTextInputLayoutPassword ;
+    TextInputLayout mTextInputLayoutPassword;
 
     public OnSubmitClickListener mOnClickListener;
 
-    public interface OnSubmitClickListener{
+    public interface OnSubmitClickListener {
         void onSubmitClick(Group group);
+
         void onCancelClick();
     }
 
-    public void setOnSubmitClickListener(OnSubmitClickListener onSubmitClickListener){
-        this.mOnClickListener = onSubmitClickListener ;
+    public void setOnSubmitClickListener(OnSubmitClickListener onSubmitClickListener) {
+        this.mOnClickListener = onSubmitClickListener;
     }
 
     public static CreatePollFragment newInstance(Group group) {
         CreatePollFragment fragment = new CreatePollFragment();
-        fragment.mGroup = group ;
+        fragment.mGroup = group;
         return fragment;
     }
 
@@ -78,62 +78,66 @@ public class CreatePollFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_create_group,container,false);
+        View view = inflater.inflate(R.layout.fragment_create_group, container, false);
 
-        ButterKnife.bind(this,view);
+        ButterKnife.bind(this, view);
 
-        Button buttonDone = ButterKnife.findById(view,R.id.button_done);
+        Button buttonDone = ButterKnife.findById(view, R.id.button_done);
         buttonDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isValid() && mOnClickListener !=null){
-                    mGroup.setId(mGroup.getId()<=0?(1000 + new Random().nextInt(9000)):mGroup.getId());
-                    mGroup.setMaxMembers(mSpinnerMaxMember.getSelectedItemPosition()+1);
+                if (isValid() && mOnClickListener != null) {
+                    mGroup.setId(mGroup.getId() <= 0 ? (1000 + new Random().nextInt(9000)) : mGroup.getId());
+                    mGroup.setMaxMembers(mSpinnerMaxMember.getSelectedItemPosition() + 1);
                     mGroup.setName(mEditTextGroupName.getText().toString());
                     mGroup.setStatus(getStatus());
-                    if(mSwitchPassword.isChecked()){
+                    if (mSwitchPassword.isChecked()) {
                         mGroup.setType(Group.TYPE_PROTECTED);
                         mGroup.setPassword(mEditTextPassword.getText().toString());
                     }
-                    if(mOnClickListener != null){
+                    if (mOnClickListener != null) {
                         mOnClickListener.onSubmitClick(mGroup);
                     }
                 }
             }
         });
-        Button buttonCancel = ButterKnife.findById(view,R.id.button_cancel);
+        Button buttonCancel = ButterKnife.findById(view, R.id.button_cancel);
         buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    if(mOnClickListener !=null){
-                        mOnClickListener.onCancelClick();
-                    }
+                if (mOnClickListener != null) {
+                    mOnClickListener.onCancelClick();
+                }
             }
         });
         return view;
     }
 
     private int getStatus() {
-        switch (mRadioGroupStatus.getCheckedRadioButtonId()){
-            case R.id.radiobutton_open : return Group.OPEN_GROUP ;
-            case R.id.radiobutton_closed : return Group.CLOSED_GROUP ;
-            case R.id.radiobutton_active : return Group.ACTIVE_GROUP ;
-            default:return Group.OPEN_GROUP;
+        switch (mRadioGroupStatus.getCheckedRadioButtonId()) {
+            case R.id.radiobutton_open:
+                return Group.OPEN_GROUP;
+            case R.id.radiobutton_closed:
+                return Group.CLOSED_GROUP;
+            case R.id.radiobutton_active:
+                return Group.ACTIVE_GROUP;
+            default:
+                return Group.OPEN_GROUP;
         }
     }
 
     private boolean isValid() {
-        boolean isValid = true ;
-        if(TextUtils.isEmpty(mEditTextGroupName.getText().toString())){
-            isValid = false ;
+        boolean isValid = true;
+        if (TextUtils.isEmpty(mEditTextGroupName.getText().toString())) {
+            isValid = false;
             Toast.makeText(getContext(), "Enter Group Name", Toast.LENGTH_SHORT).show();
             /*mTextInputEditTextGroupName.setEnabled(true);
             mTextInputEditTextGroupName.setError(getString(R.string.error_msg_required));*/
-        }else if(mSwitchPassword.isChecked() && TextUtils.isEmpty(mEditTextPassword.getText().toString())){
-            isValid = false ;
+        } else if (mSwitchPassword.isChecked() && TextUtils.isEmpty(mEditTextPassword.getText().toString())) {
+            isValid = false;
             mTextInputLayoutPassword.setEnabled(true);
             mTextInputLayoutPassword.setError(getString(R.string.error_msg_required));
         }
-        return isValid ;
+        return isValid;
     }
 }

@@ -67,6 +67,7 @@
     <string name="lbl_group_name">Group Name</string>
     <string name="lbl_status">Group Status</string>
     <string name="lbl_members" formatted="false">Members : %d / %d</string>
+    <string name="lbl_show_all">SHOW ALL</string>
     <string-array name="group_status_array">
         <item>@string/lbl_open</item>
         <item>@string/lbl_active</item>

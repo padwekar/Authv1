@@ -4,9 +4,6 @@ import com.example.savi.auth.constant.OperationConstants;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 
-/**
- * Created by Savi on 27-11-2016.
- */
 public class BaseOperation {
 
     protected boolean isEmpty(DataSnapshot dataSnapshot){
