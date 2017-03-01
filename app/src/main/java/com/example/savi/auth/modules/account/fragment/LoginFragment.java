@@ -5,7 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -149,31 +153,33 @@ public class LoginFragment extends BaseAuthFragment {
             @Override
             public void onClick(View v) {
                // mProgressBar.setVisibility(View.VISIBLE);
-                showProgressDialog();
-                String username = mEditTextEmail.getText().toString();
-                final String password = mEditTextPassWord.getText().toString();
-                if (android.util.Patterns.EMAIL_ADDRESS.matcher(username).matches()) {
-                    //  email or not using proper regular expression
-                    performLogin(username, password); // perform sign in with email & password or ask user to enter the userName
-                } else {
-                    //get the emailId stored against username
+                if(isValid()){
+                    showProgressDialog();
+                    String username = mEditTextEmail.getText().toString();
+                    final String password = mEditTextPassWord.getText().toString();
+                    if (android.util.Patterns.EMAIL_ADDRESS.matcher(username).matches()) {
+                        //  email or not using proper regular expression
+                        performLogin(username, password); // perform sign in with email & password or ask user to enter the userName
+                    } else {
+                        //get the emailId stored against username
 
-                    fireBaseRef.child("user_ids").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (dataSnapshot != null) {
-                                String userId = dataSnapshot.getValue(String.class);
-                                performLogin(userId, password);
+                        fireBaseRef.child("user_ids").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot != null) {
+                                    String userId = dataSnapshot.getValue(String.class);
+                                    performLogin(userId, password);
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onCancelled(FirebaseError firebaseError) {
+                            @Override
+                            public void onCancelled(FirebaseError firebaseError) {
 
-                        }
-                    });
+                            }
+                        });
+                    }
+
                 }
-
             }
         });
 
@@ -185,6 +191,18 @@ public class LoginFragment extends BaseAuthFragment {
         });
 
         return view;
+    }
+
+    private boolean isValid() {
+        boolean isValid = true ;
+        if(TextUtils.isEmpty(mEditTextEmail.getText().toString())){
+            Toast.makeText(getContext(), "Enter Email Id", Toast.LENGTH_SHORT).show();
+            isValid = false ;
+        }else if(TextUtils.isEmpty(mEditTextPassWord.getText().toString())){
+            Toast.makeText(getContext(), "Enter Password", Toast.LENGTH_SHORT).show();
+            isValid = false ;
+        }
+        return isValid;
     }
 
     private void performLogin(String emailId, String password) {
@@ -339,12 +357,12 @@ public class LoginFragment extends BaseAuthFragment {
 
 
 
-  /*  public void setFragment(Fragment fragment) {
+/*   public void setFragment(Fragment fragment) {
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         // fragmentManager.popBackStackImmediate();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
-    }
-*/
+    }*/
+
 }

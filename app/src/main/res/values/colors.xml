@@ -14,4 +14,7 @@
         <item>@color/red</item>
     </array>
 
+    <color name="disabled_background_color">#10181818</color>
+    <color name="disabled_text_color">#aaa</color>
+
 </resources>
