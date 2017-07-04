@@ -7,7 +7,6 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.savi.auth.R;
 import com.example.savi.auth.base.BaseViewPagerFragment;
@@ -20,8 +19,7 @@ public class FriendContainerFragment extends BaseViewPagerFragment {
 
 
     public static FriendContainerFragment newInstance() {
-        FriendContainerFragment fragment = new FriendContainerFragment();
-        return fragment;
+        return new FriendContainerFragment();
     }
 
 
@@ -39,6 +37,7 @@ public class FriendContainerFragment extends BaseViewPagerFragment {
 
         viewPagerAdapter.setFragmentList(fragmentList);
         viewPager.setOffscreenPageLimit(3);
+
         viewPager.setAdapter(viewPagerAdapter);
         return view;
     }
