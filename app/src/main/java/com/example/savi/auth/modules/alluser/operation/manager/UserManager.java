@@ -1,6 +1,7 @@
 package com.example.savi.auth.modules.alluser.operation.manager;
 
 import com.example.savi.auth.modules.alluser.operation.GetAllUserOperation;
+import com.example.savi.auth.modules.alluser.operation.GetUserFromOperation;
 import com.example.savi.auth.pojo.User;
 import com.firebase.client.FirebaseError;
 
@@ -35,7 +36,35 @@ public class UserManager {
         });
     }
 
-    public void getUserFrom(String startsWithUid, GetAllUserOperation.OnGetAllUserListener listener){
+    public void getUserFrom(String startsWithUid,int count, final GetUserFromOperation.OnUserListener listener){
+         new GetUserFromOperation(startsWithUid,count, new GetUserFromOperation.OnUserListener() {
+             @Override
+             public void onUserAdded(User user) {
+                 if(listener!=null){
+                     listener.onUserAdded(user);
+                 }
+             }
 
+             @Override
+             public void onUserUpdated(User user) {
+                if(listener!=null){
+                    listener.onUserUpdated(user);
+                }
+             }
+
+             @Override
+             public void onUserRemoved(User user) {
+                if(listener!=null){
+                    listener.onUserRemoved(user);
+                }
+             }
+
+             @Override
+             public void onCancelled(FirebaseError error) {
+                if(listener!=null){
+                    listener.onCancelled(error);
+                }
+             }
+         });
     }
 }

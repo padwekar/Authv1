@@ -25,9 +25,9 @@ public class User {
     public final static int ACTION_REJECT_REQUEST = ACTION_ACCEPT_REQUEST + 1;
 
 
-    public final static String[] friendshipStatus = {"NOT FRIENDS", "SEND FRIEND REQUEST", "FRIENDS", "REQUEST FROM"};
+    public transient final static String[] friendshipStatus = {"NOT FRIENDS", "SEND FRIEND REQUEST", "FRIENDS", "REQUEST FROM"};
 
-    public final static String[] friendshipActions = {"SEND FRIEND REQUEST", "CANCEL FRIEND REQUEST", "UNFRIEND", "ACCEPT/REJECT"};
+    public transient final static String[] friendshipActions = {"SEND FRIEND REQUEST", "CANCEL FRIEND REQUEST", "UNFRIEND", "ACCEPT/REJECT"};
 
     private String uid;
     private String userName ;
@@ -39,8 +39,17 @@ public class User {
     private int profileStatus = NEW;
     private int picPosition;
     private transient int friendShipStatus;
+    private transient boolean isLast ;
 
     public User() {
+    }
+
+    public boolean isLast() {
+        return isLast;
+    }
+
+    public void setLast(boolean last) {
+        isLast = last;
     }
 
     public String getUserName() {

@@ -17,13 +17,20 @@ public class GetAllUserOperation extends BaseOperation {
         void onCancelled(FirebaseError error);
     }
 
+    public int limit = 2;
+    public int count = 0;
     public GetAllUserOperation(final OnGetAllUserListener listener){
         Firebase fireBaseRef =  new Firebase(Constants.TODOCLOUD_ROOT_FIREBASE_URL + Constants.USER_DETAIL);
-        fireBaseRef.addChildEventListener(new ChildEventListener() {
+        fireBaseRef.orderByPriority().limitToFirst(limit).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String key) {
              if(isEmpty(dataSnapshot)||listener==null)return;
-                listener.onUserAdded(dataSnapshot.getValue(User.class));
+                User user = dataSnapshot.getValue(User.class);
+                if (count++ == limit - 1) {
+                    user.setLast(true);
+                    count=0;
+                }
+                listener.onUserAdded(user);
             }
 
             @Override

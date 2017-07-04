@@ -2,9 +2,9 @@ package com.example.savi.auth.modules.alluser.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +16,7 @@ import com.example.savi.auth.base.BaseViewPagerFragment;
 import com.example.savi.auth.constant.Constants;
 import com.example.savi.auth.constant.URLConstants;
 import com.example.savi.auth.modules.alluser.adapter.AllUserAdapter;
+import com.example.savi.auth.modules.alluser.operation.GetUserFromOperation;
 import com.example.savi.auth.modules.alluser.operation.manager.UserManager;
 import com.example.savi.auth.modules.dashboard.activity.HomeActivity;
 import com.example.savi.auth.modules.message.fragment.ChatFragment;
@@ -23,6 +24,8 @@ import com.example.savi.auth.operation.manager.SocialManager;
 import com.example.savi.auth.pojo.NotificationRequest;
 import com.example.savi.auth.pojo.User;
 import com.example.savi.auth.utils.AuthPreferences;
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
@@ -42,6 +45,7 @@ public class AllUserFragment extends BaseViewPagerFragment {
 
     private ProgressBar mProgressBar;
     private String uid;
+    public String startsFrom = "";
 
     @Nullable
     @Override
@@ -52,7 +56,6 @@ public class AllUserFragment extends BaseViewPagerFragment {
 
         Firebase.setAndroidContext(getContext());
         mFireBaseRef = new Firebase(TODOCLOUD_FIREBASE_ROOT_URL);
-
         mAllUserAdapter = new AllUserAdapter(getContext());
 
         uid = AuthPreferences.getInstance().getUserUid();
@@ -61,9 +64,7 @@ public class AllUserFragment extends BaseViewPagerFragment {
         mAllUserAdapter.setOnFriendShipStatusClickListener(new AllUserAdapter.OnFriendShipStatusClickListener() {
             @Override
             public void onFriedShipStatusClick(final User user) {
-                mFireBaseRef.child(URLConstants.USER_DETAIL).child(user.getUid()).removeValue();
-                //TODO : Uncomment it later
-                //sendFriendRequest(user);
+                sendFriendRequest(user);
             }
         });
 
@@ -74,15 +75,53 @@ public class AllUserFragment extends BaseViewPagerFragment {
                 ((HomeActivity) getActivity()).setFragment(ChatFragment.newInstance(user));
             }
         });
+
         getCircleMap();
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_alluser);
 //        recyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(mAllUserAdapter);
-        getAllUser();
 
+      //
+        // getAllUser();
+        loadMore(3);
+
+        view.findViewById(R.id.button_load_more).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadMore(3);
+            }
+        });
         return view;
+    }
+
+    private void loadMore(int count) {
+        new UserManager().getUserFrom(startsFrom,count, new GetUserFromOperation.OnUserListener() {
+            @Override
+            public void onUserAdded(User user) {
+                if (mProgressBar.getVisibility() != View.GONE) mProgressBar.setVisibility(View.GONE);
+                if (!uid.equals(user.getUid())) {
+                    startsFrom = user.getUid();
+                    mAllUserAdapter.addUser(user);
+                }
+            }
+
+            @Override
+            public void onUserUpdated(User user) {
+                if (!uid.equals(user.getUid())) mAllUserAdapter.addUser(user);
+            }
+
+            @Override
+            public void onUserRemoved(User user) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError error) {
+
+            }
+        });
     }
 
     public CharSequence getTitle() {
@@ -93,8 +132,6 @@ public class AllUserFragment extends BaseViewPagerFragment {
         new UserManager().getAllUsers(new UserManager.OnGetAllUserManager() {
             @Override
             public void onUserAdded(User user) {
-                if (mProgressBar.getVisibility() != View.GONE) mProgressBar.setVisibility(View.GONE);
-                if (!uid.equals(user.getUid())) mAllUserAdapter.addUser(user);
 
             }
 
@@ -132,11 +169,9 @@ public class AllUserFragment extends BaseViewPagerFragment {
     }
 
     private void sendFriendRequest(User receiverInfo) {
-
         mFireBaseRef.child(Constants.CIRCLE).child(uid).child(receiverInfo.getUid()).setValue(User.REQUEST_SENT, new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-
                 String message = "Successful";
                 if (firebaseError != null)
                     message = firebaseError.getMessage();

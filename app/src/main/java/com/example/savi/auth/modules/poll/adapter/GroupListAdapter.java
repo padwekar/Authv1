@@ -11,8 +11,6 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -32,8 +30,8 @@ public class GroupListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private TypedArray mColorTypedArray;
     private String[] mHeaderArray;
 
-    private final int HEADER = 0 ;
-    private final int CHILD = HEADER+1 ;
+    public final static int HEADER = 0 ;
+    public final static int CHILD = HEADER+1 ;
 
     public GroupListAdapter(Context mContext) {
         this.mContext = mContext;
@@ -41,7 +39,6 @@ public class GroupListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         mColorTypedArray = mContext.getResources().obtainTypedArray(R.array.status_color_array);
         mHeaderArray = mContext.getResources().getStringArray(R.array.group_status_array);
         initGroupList();
-
     }
 
     private void initGroupList() {
@@ -52,7 +49,6 @@ public class GroupListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             mSparseArrayGroup.append(i++, new ArrayList<Group>());
         }
     }
-
 
     public void updateGroupList(SparseArray<List<Group>> groupMap) {
         mSparseArrayGroup = groupMap;

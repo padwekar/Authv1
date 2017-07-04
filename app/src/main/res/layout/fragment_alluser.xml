@@ -11,6 +11,12 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_alluser"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/button_load_more"
+        android:text="Load More"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>

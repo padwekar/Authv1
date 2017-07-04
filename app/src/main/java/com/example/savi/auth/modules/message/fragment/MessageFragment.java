@@ -53,7 +53,9 @@ public class MessageFragment extends BaseViewPagerFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         View view  = inflater.inflate(R.layout.fragment_messages,container,false);
 
-        Toast.makeText(getContext(),"In MessageFragment",Toast.LENGTH_SHORT).show();
+
+        Toast.makeText(getContext(), "Name : "+getActivity().getIntent().getStringExtra("name"), Toast.LENGTH_SHORT).show();
+
         Firebase.setAndroidContext(getContext());
         userHashMap = new HashMap<>();
         mInboxAdapter = new InboxAdapter(getContext());
@@ -127,7 +129,6 @@ public class MessageFragment extends BaseViewPagerFragment {
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 Log.w("Now in", "onChildChange");
                 final String key = dataSnapshot.getKey();
-                ;
                 mFireBaseRefnew.removeEventListener(this);
                 mFireBaseRefnew.child(key).limitToLast(1).addValueEventListener(new ValueEventListener() {
                     @Override
